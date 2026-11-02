@@ -3,7 +3,7 @@
     "file": "00-git-state.png",
     "phase": "0",
     "description": "Estado inicial de la rama antes de la Guia 7",
-    "source": "git log --oneline -5 && git branch --show-current",
-    "captured_at": "2026-11-01T21:09:39-05:00"
+    "source": "git log --oneline a636547 -5 && git branch --show-current",
+    "captured_at": "2026-11-01T21:43:16-05:00"
   }
 ]

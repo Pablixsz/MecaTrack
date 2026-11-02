@@ -1,4 +1,4 @@
-# git log --oneline -5 && git branch --show-current
+# git log --oneline a636547 -5 && git branch --show-current
 # cwd: . | exit 0
 
 a636547 Informe Guia 6: actualiza documento Word

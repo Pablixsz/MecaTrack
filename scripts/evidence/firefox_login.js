@@ -14,17 +14,23 @@ const { firefox } = require('playwright');
 const PROFILE = path.join(os.homedir(), '.mecatrack-firefox-profile');
 const TIMEOUT_MS = 30 * 60 * 1000;
 const POLL_MS = 3000;
+// Solo la cuenta duena del repo puede ver Settings, crear secretos y conectar SonarCloud.
+const OWNER = 'pablixsz';
 
-async function githubLoggedIn(context) {
-  const cookies = await context.cookies('https://github.com');
-  return cookies.some((c) => c.name === 'logged_in' && c.value === 'yes');
+async function githubLogin(context) {
+  const response = await context.request.get('https://github.com/');
+  const match = (await response.text()).match(/<meta name="user-login" content="([^"]*)"/);
+  return match ? match[1] : '';
 }
 
-async function sonarLoggedIn(context) {
+async function sonarLogin(context) {
   const response = await context.request.get('https://sonarcloud.io/api/users/current');
-  if (!response.ok()) return false;
-  return (await response.json()).isLoggedIn === true;
+  if (!response.ok()) return '';
+  const user = await response.json();
+  return user.isLoggedIn ? user.login : '';
 }
+
+const isOwner = (login) => login.toLowerCase().startsWith(OWNER);
 
 (async () => {
   const context = await firefox.launchPersistentContext(PROFILE, {
@@ -33,6 +39,8 @@ async function sonarLoggedIn(context) {
   });
   let closed = false;
   context.on('close', () => { closed = true; });
+  // Empieza limpio para no reutilizar una sesion de otra cuenta (solo afecta a este perfil).
+  await context.clearCookies();
 
   const github = context.pages()[0] || (await context.newPage());
   await github.goto('https://github.com/login');
@@ -41,18 +49,18 @@ async function sonarLoggedIn(context) {
   console.log('Firefox abierto: inicia sesion en GitHub y SonarCloud en sus pestanas.');
 
   const deadline = Date.now() + TIMEOUT_MS;
-  let status = { github: false, sonarcloud: false };
+  let status = { github: '', sonarcloud: '' };
   while (!closed && Date.now() < deadline) {
     try {
-      status = { github: await githubLoggedIn(context), sonarcloud: await sonarLoggedIn(context) };
+      status = { github: await githubLogin(context), sonarcloud: await sonarLogin(context) };
     } catch (error) {
       if (closed) break;
     }
-    if (status.github && status.sonarcloud) break;
+    if (isOwner(status.github) && isOwner(status.sonarcloud)) break;
     await new Promise((resolve) => setTimeout(resolve, POLL_MS));
   }
 
-  console.log(`Sesion GitHub: ${status.github} | Sesion SonarCloud: ${status.sonarcloud}`);
+  console.log(`Sesion GitHub: ${status.github || 'ninguna'} | Sesion SonarCloud: ${status.sonarcloud || 'ninguna'}`);
   if (!closed) await context.close();
-  process.exit(status.github && status.sonarcloud ? 0 : 1);
+  process.exit(isOwner(status.github) && isOwner(status.sonarcloud) ? 0 : 1);
 })();

@@ -174,7 +174,7 @@ def build_html(title, subtitle, panels, width=1180):
 def render(browser, out_png, title, subtitle, panels, width=1180):
     raw = '\n'.join(str(value) for panel in _flatten(panels) for value in panel.values())
     assert_no_secrets(f'{raw}\n{title}\n{subtitle}', os.path.basename(out_png))
-    page = browser.new_page(viewport={'width': width + 48, 'height': 800}, device_scale_factor=2)
+    page = browser.new_page(viewport={'width': width + 48, 'height': 100}, device_scale_factor=2)
     page.set_content(build_html(title, subtitle, panels, width))
     page.screenshot(path=out_png, full_page=True)
     page.close()
