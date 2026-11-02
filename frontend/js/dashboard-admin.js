@@ -79,7 +79,7 @@ async function cargarCitas() {
   try {
     todasLasCitas = await apiGet('/appointments');
     renderizarResumen();
-    renderizarCitas().catch(errorNoControlado);
+    renderizarCitas();
   } catch (error) {
     mostrarError(error);
   }
@@ -132,7 +132,7 @@ document.getElementById('filtro-fecha').addEventListener('change', renderizarCit
 document.getElementById('btn-limpiar-filtros').addEventListener('click', () => {
   document.getElementById('filtro-estado').value = '';
   document.getElementById('filtro-fecha').value = '';
-  renderizarCitas().catch(errorNoControlado);
+  renderizarCitas();
 });
 
 document.getElementById('tabla-citas').addEventListener('click', async (e) => {
