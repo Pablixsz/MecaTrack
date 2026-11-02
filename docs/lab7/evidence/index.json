@@ -61,5 +61,33 @@
     "description": "Mutation testing: score final",
     "source": "venv/bin/python ../scripts/mutation_score.py",
     "captured_at": "2026-11-01T22:14:18-05:00"
+  },
+  {
+    "file": "04a-ci-fail-run.png",
+    "phase": "3",
+    "description": "GitHub Actions: el job de mutation testing falla en una rama temporal con menos pruebas",
+    "source": "https://github.com/Pablixsz/MecaTrack/actions/runs/41382792374",
+    "captured_at": "2026-11-01T22:26:08-05:00"
+  },
+  {
+    "file": "04b-ci-fail-under-50.png",
+    "phase": "3",
+    "description": "GitHub Actions: el paso del score falla con 6.5 %, por debajo del minimo de 50 %",
+    "source": "https://github.com/Pablixsz/MecaTrack/actions/runs/41382792374/job/125077017214#step:6:1",
+    "captured_at": "2026-11-01T22:26:18-05:00"
+  },
+  {
+    "file": "05a-ci-green.png",
+    "phase": "3",
+    "description": "GitHub Actions: pruebas y mutation testing en verde",
+    "source": "https://github.com/Pablixsz/MecaTrack/actions/runs/41382012710",
+    "captured_at": "2026-11-01T22:26:25-05:00"
+  },
+  {
+    "file": "05b-readme-badges.png",
+    "phase": "3",
+    "description": "README con los badges de CI, Quality Gate y mutation score",
+    "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/README.md",
+    "captured_at": "2026-11-01T22:26:32-05:00"
   }
 ]
