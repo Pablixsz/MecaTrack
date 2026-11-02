@@ -1,0 +1,44 @@
+{
+  "quality_gate": "OK",
+  "conditions": [
+    {
+      "metric": "new_reliability_rating",
+      "value": "1"
+    },
+    {
+      "metric": "new_security_rating",
+      "value": "1"
+    },
+    {
+      "metric": "new_maintainability_rating",
+      "value": "1"
+    },
+    {
+      "metric": "new_coverage",
+      "value": "99.6"
+    },
+    {
+      "metric": "new_duplicated_lines_density",
+      "value": "0.0"
+    },
+    {
+      "metric": "new_security_hotspots_reviewed",
+      "value": "100.0"
+    }
+  ],
+  "measures": {
+    "coverage": "97.2",
+    "reliability_rating": "1.0",
+    "bugs": "0",
+    "code_smells": "2",
+    "security_rating": "1.0",
+    "ncloc": "7414",
+    "vulnerabilities": "0",
+    "sqale_rating": "1.0"
+  },
+  "before": {
+    "bugs": 32,
+    "vulnerabilities": 15
+  },
+  "source": "https://sonarcloud.io/api (Pablixsz_MecaTrack)"
+}

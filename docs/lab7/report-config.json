@@ -1,0 +1,23 @@
+{
+  "authors": [
+    {
+      "name": "Pablo Alejandro Rodriguez Suarez",
+      "code": ""
+    },
+    {
+      "name": "Daniel Steven Londoño Vanegas",
+      "code": ""
+    },
+    {
+      "name": "Omar David Gutierrez Torrez",
+      "code": ""
+    }
+  ],
+  "teacher": "",
+  "course": "Taller de Programación",
+  "session": "Sesiones 13 y 14",
+  "date": "1 de noviembre de 2026",
+  "repoUrl": "https://github.com/Pablixsz/MecaTrack",
+  "pipelineUrl": "https://github.com/Pablixsz/MecaTrack/actions?query=branch%3Amecatrack-final",
+  "videoUrl": ""
+}
