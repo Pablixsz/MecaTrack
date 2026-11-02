@@ -1,0 +1,6 @@
+# venv/bin/python ../scripts/mutation_score.py
+# cwd: backend | exit 0
+
+killed=289 survived=5 no_tests=0 timeout=0 total=294
+mutation score: 98.3% (min 50.0%)
+OK

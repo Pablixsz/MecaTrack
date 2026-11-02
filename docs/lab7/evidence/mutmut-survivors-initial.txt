@@ -1,0 +1,110 @@
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_bay__mutmut_7: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_bay__mutmut_8: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_bay__mutmut_10: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_bay__mutmut_14: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_mechanic__mutmut_4: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_mechanic__mutmut_5: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_mechanic__mutmut_7: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_available_mechanic__mutmut_11: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_3: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_4: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_5: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_7: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_8: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_9: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_12: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_13: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_14: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_15: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_16: survived
+    domain.scheduling.allocation.xǁResourceAllocatorǁfind_bay_and_mechanic__mutmut_17: survived
+    domain.scheduling.rules.x_ensure_participant__mutmut_3: survived
+    domain.scheduling.rules.x_ensure_participant__mutmut_6: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_9: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_14: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_18: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_23: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_40: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_44: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_46: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_50: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_51: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_55: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_56: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_59: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_69: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_88: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_3: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_7: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_8: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_9: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_10: survived
+    application.scheduling.services.xǁAppointmentServiceǁlist_for__mutmut_1: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_1: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_2: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_3: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_4: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_5: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_6: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_7: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_8: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_9: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_10: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_11: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_12: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_13: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_14: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_15: no tests
+    application.scheduling.services.xǁAppointmentServiceǁget__mutmut_16: no tests
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_2: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_3: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_5: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_6: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_7: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_8: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_9: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_10: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_11: survived
+    application.scheduling.services.xǁAppointmentServiceǁchange_status__mutmut_12: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_2: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_4: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_5: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_6: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_7: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_9: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_10: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_11: survived
+    application.scheduling.services.xǁAppointmentServiceǁcancel__mutmut_12: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_get__mutmut_2: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_get__mutmut_4: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_get__mutmut_5: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_get__mutmut_6: survived
+    application.scheduling.services.xǁAppointmentServiceǁ_get__mutmut_7: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_2: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_4: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_5: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_6: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_7: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_10: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_14: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_15: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_16: survived
+    application.payments.services.xǁPaymentServiceǁlist_for_appointment__mutmut_17: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_2: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_4: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_5: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_6: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_7: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_9: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_12: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_13: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_14: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_15: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_16: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_17: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_18: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_19: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_23: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_24: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_25: survived
+    application.payments.services.xǁPaymentServiceǁpay__mutmut_26: survived

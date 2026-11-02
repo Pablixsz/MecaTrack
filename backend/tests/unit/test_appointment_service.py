@@ -17,11 +17,12 @@ from domain.catalog.ports import ServiceRepository, VehicleRepository
 from domain.payments.entities import Payment
 from domain.payments.ports import PaymentRepository
 from domain.scheduling.allocation import ResourceAllocator
+from domain.scheduling.entities import AppointmentView
 from domain.scheduling.ports import AppointmentRepository
-from domain.shared.errors import Conflict, InvalidInput, PermissionDenied
+from domain.shared.errors import Conflict, DomainError, InvalidInput, NotFound, PermissionDenied
 from domain.shared.ports import UnitOfWork
-from tests.unit.factories import (CLIENT, MECHANIC, OTHER_CLIENT, START, make_appointment, make_bay, make_mechanic,
-                                  make_service, make_vehicle)
+from tests.unit.factories import (CLIENT, MECHANIC, OTHER_CLIENT, OWNER, START, make_appointment, make_bay,
+                                  make_mechanic, make_service, make_vehicle)
 
 
 @pytest.fixture
@@ -163,3 +164,134 @@ def test_a_client_cannot_book_on_behalf_of_someone_else(service, deps):
     with pytest.raises(PermissionDenied):
         service.book(CLIENT, 10, 1, START, client_user_id=OTHER_CLIENT.user_id)
     deps['allocator'].find_bay_and_mechanic.assert_not_called()
+
+
+# --- Mutation testing: argumentos, mensajes y casos sin cubrir ---------------
+
+def test_book_looks_up_the_requested_vehicle_and_service(service, deps):
+    service.book(CLIENT, 10, 1, START)
+    deps['vehicles'].get.assert_called_once_with(10)
+    deps['services'].get.assert_called_once_with(1)
+
+
+def test_book_defaults_to_cash_and_pending_payments(service, deps):
+    service.book(CLIENT, 10, 1, START)
+    payments = [c.args[0] for c in deps['payments'].add.call_args_list]
+    assert [p.payment_method for p in payments] == ['cash', 'cash']
+    assert [p.status for p in payments] == ['pending', 'pending']
+
+
+def test_book_stores_vehicle_service_and_start(service, deps):
+    service.book(CLIENT, 10, 1, START)
+    [stored] = deps['appointments'].add.call_args.args
+    assert (stored.vehicle_id, stored.service_id, stored.scheduled_start) == (10, 1, START)
+
+
+def test_book_conflict_has_a_stable_code(service, deps):
+    deps['allocator'].find_bay_and_mechanic.return_value = (make_bay(), None)
+    with pytest.raises(Conflict) as error:
+        service.book(CLIENT, 10, 1, START)
+    assert error.value.code == 'no_availability'
+
+
+def test_book_lists_the_valid_payment_methods_in_the_error(service):
+    with pytest.raises(InvalidInput) as error:
+        service.book(CLIENT, 10, 1, START, payment_method='bitcoin')
+    assert error.value.message == "Método de pago inválido, debe ser uno de: ('cash', 'card', 'transfer')"
+
+
+def test_booking_for_someone_else_explains_why_it_is_denied(service):
+    with pytest.raises(PermissionDenied) as error:
+        service.book(CLIENT, 10, 1, START, client_user_id=OTHER_CLIENT.user_id)
+    assert error.value.message == 'No puedes agendar a nombre de otro cliente'
+
+
+def test_a_client_may_name_himself_when_booking(service, deps):
+    service.book(CLIENT, 10, 1, START, client_user_id=CLIENT.user_id)
+    assert deps['appointments'].add.call_args.args[0].client_user_id == CLIENT.user_id
+
+
+def test_list_for_delegates_with_the_actor(service, deps):
+    deps['appointments'].list_views_for.return_value = ['view']
+    assert service.list_for(CLIENT) == ['view']
+    deps['appointments'].list_views_for.assert_called_once_with(CLIENT)
+
+
+def test_get_returns_the_view_for_a_participant(service, deps):
+    view = AppointmentView(appointment=make_appointment(), client_name='Laura', mechanic_name='Andres',
+                           vehicle_plate='ABC123', service_name='Aceite', bay_number='Bahia 1')
+    deps['appointments'].get_view.return_value = view
+    assert service.get(CLIENT, 7) is view
+    deps['appointments'].get_view.assert_called_once_with(7)
+
+
+def test_get_unknown_appointment_is_not_found(service, deps):
+    deps['appointments'].get_view.return_value = None
+    with pytest.raises(NotFound) as error:
+        service.get(CLIENT, 404)
+    assert error.value.message == 'Cita no encontrada'
+
+
+def test_get_denies_someone_else(service, deps):
+    view = AppointmentView(appointment=make_appointment(), client_name=None, mechanic_name=None,
+                           vehicle_plate=None, service_name=None, bay_number=None)
+    deps['appointments'].get_view.return_value = view
+    with pytest.raises(PermissionDenied) as error:
+        service.get(OTHER_CLIENT, 7)
+    assert error.value.message == 'No tienes permiso para ver esta cita'
+
+
+def test_change_status_saves_the_new_status_and_commits(service, deps):
+    appointment = make_appointment()
+    deps['appointments'].get.return_value = appointment
+
+    assert service.change_status(MECHANIC, 7, 'in_progress') is appointment
+
+    deps['appointments'].get.assert_called_once_with(7)
+    assert appointment.status == 'in_progress'
+    deps['appointments'].save.assert_called_once_with(appointment)
+    deps['uow'].commit.assert_called_once_with()
+
+
+def test_change_status_rejects_unknown_status(service, deps):
+    deps['appointments'].get.return_value = make_appointment()
+    with pytest.raises(InvalidInput) as error:
+        service.change_status(OWNER, 7, 'lost')
+    assert error.value.message.startswith('Estado inválido, debe ser uno de: ')
+    deps['appointments'].save.assert_not_called()
+
+
+def test_managers_change_status_of_any_appointment(service, deps):
+    deps['appointments'].get.return_value = make_appointment(mechanic_user_id=555)
+    assert service.change_status(OWNER, 7, 'completed').status == 'completed'
+
+
+def test_change_status_denial_explains_why(service, deps):
+    deps['appointments'].get.return_value = make_appointment(mechanic_user_id=555)
+    with pytest.raises(PermissionDenied) as error:
+        service.change_status(MECHANIC, 7, 'completed')
+    assert error.value.message == 'No tienes permiso para modificar esta cita'
+
+
+def test_change_status_of_unknown_appointment_is_not_found(service, deps):
+    deps['appointments'].get.return_value = None
+    with pytest.raises(NotFound) as error:
+        service.change_status(OWNER, 404, 'completed')
+    assert error.value.message == 'Cita no encontrada'
+
+
+def test_cancel_loads_the_requested_appointment(service, deps):
+    deps['appointments'].get.return_value = make_appointment()
+    service.cancel(CLIENT, 7)
+    deps['appointments'].get.assert_called_once_with(7)
+
+
+@pytest.mark.parametrize('actor, status, message', [
+    (OTHER_CLIENT, 'pending', 'No tienes permiso para cancelar esta cita'),
+    (CLIENT, 'completed', 'Esta cita ya no se puede cancelar'),
+])
+def test_cancel_errors_explain_why(service, deps, actor, status, message):
+    deps['appointments'].get.return_value = make_appointment(status=status)
+    with pytest.raises(DomainError) as error:
+        service.cancel(actor, 7)
+    assert error.value.message == message

@@ -47,3 +47,15 @@ def test_participants_rule():
         ensure_participant(actor, appointment, 'x')  # no lanza
     with pytest.raises(PermissionDenied):
         ensure_participant(OTHER_CLIENT, appointment, 'No tienes permiso')
+
+
+# --- Mutation testing: ensure_participant usa el mensaje indicado -------------
+
+@pytest.mark.parametrize('actor, appointment', [
+    (OTHER_CLIENT, make_appointment()),
+    (MECHANIC, make_appointment(mechanic_user_id=555)),
+])
+def test_ensure_participant_raises_with_the_given_message(actor, appointment):
+    with pytest.raises(PermissionDenied) as error:
+        ensure_participant(actor, appointment, 'sin permiso')
+    assert error.value.message == 'sin permiso'

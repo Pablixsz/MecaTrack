@@ -40,5 +40,26 @@
     "description": "Pruebas y cobertura local del backend",
     "source": "PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest -q -o addopts= --disable-warnings --cov --cov-report=term --cov-report=xml",
     "captured_at": "2026-11-01T22:11:08-05:00"
+  },
+  {
+    "file": "03a-mutmut-initial.png",
+    "phase": "2",
+    "description": "Mutation testing: score inicial antes de anadir pruebas",
+    "source": "venv/bin/python ../scripts/mutation_score.py",
+    "captured_at": "2026-11-01T22:12:32-05:00"
+  },
+  {
+    "file": "03b-mutmut-results.png",
+    "phase": "2",
+    "description": "mutmut: sobrevivientes restantes",
+    "source": "venv/bin/mutmut results",
+    "captured_at": "2026-11-01T22:14:17-05:00"
+  },
+  {
+    "file": "03c-mutation-score-final.png",
+    "phase": "2",
+    "description": "Mutation testing: score final",
+    "source": "venv/bin/python ../scripts/mutation_score.py",
+    "captured_at": "2026-11-01T22:14:18-05:00"
   }
 ]
