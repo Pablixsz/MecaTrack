@@ -3,5 +3,5 @@
   "private": true,
   "description": "Genera informe/Informe_Guia5_MecaTrack.docx a partir de las evidencias reales",
   "scripts": { "build": "node build_informe.js" },
-  "dependencies": { "docx": "9.7.2" }
+  "dependencies": { "docx": "9.15.0" }
 }
