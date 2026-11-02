@@ -1,0 +1,20 @@
+# curl -s -D - -o /dev/null http://127.0.0.1:5000/api/v1/services
+# cwd: . | exit 0
+
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.14.8
+Date: Mon, 02 Nov 2026 03:43:33 GMT
+Content-Type: application/json
+Content-Length: 157
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+X-RateLimit-Limit: 300
+X-RateLimit-Remaining: 298
+X-RateLimit-Reset: 1793591061
+X-RateLimit-Retry-After: 47
+Access-Control-Allow-Origin: http://127.0.0.1:5500
+Vary: Origin
+Connection: close
+

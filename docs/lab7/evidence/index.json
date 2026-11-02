@@ -173,5 +173,33 @@
     "description": "Frontend: un cliente recibe 403 en /bays y vuelve al login",
     "source": "http://127.0.0.1:5500/index.html",
     "captured_at": "2026-11-01T22:32:13-05:00"
+  },
+  {
+    "file": "09a-owasp-table.png",
+    "phase": "5",
+    "description": "OWASP API Security Top 10 2023: table of implemented controls",
+    "source": "docs/lab7/owasp-controls.md",
+    "captured_at": "2026-11-01T22:43:21-05:00"
+  },
+  {
+    "file": "09b-owasp-tests.png",
+    "phase": "5",
+    "description": "OWASP: automated tests for each control",
+    "source": "PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest tests/integration/test_owasp_controls.py -o addopts= -v --disable-warnings --tb=short -p no:cacheprovider --no-header 2>&1 | grep -E \"PASSED|FAILED|passed|failed\" | sed -E \"s#tests/integration/test_owasp_controls.py::##\" | cut -c1-96",
+    "captured_at": "2026-11-01T22:43:32-05:00"
+  },
+  {
+    "file": "09c-owasp-rate-limit.png",
+    "phase": "5",
+    "description": "OWASP API2/API4: login limited to 5 attempts per minute",
+    "source": "for i in 1 2 3 4 5 6; do curl -s -o /dev/null -w \"attempt $i: HTTP %{http_code}\\n\" -X POST http://127.0.0.1:5000/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\"email\\\":\\\"admin@demo.test\\\",\\\"password\\\":\\\"incorrecta\\\"}\"; done",
+    "captured_at": "2026-11-01T22:43:33-05:00"
+  },
+  {
+    "file": "09d-owasp-headers.png",
+    "phase": "5",
+    "description": "OWASP API8: security headers on a real response",
+    "source": "curl -s -D - -o /dev/null http://127.0.0.1:5000/api/v1/services",
+    "captured_at": "2026-11-01T22:43:34-05:00"
   }
 ]

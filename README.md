@@ -10,6 +10,17 @@ Sistema de gestión de citas y seguimiento para un taller mecánico. Proyecto fi
 
 Cuando se agenda una cita, el **motor de agendamiento** (`backend/domain/scheduling/allocation.py`) asigna solo una bahía y un mecánico libres, sin que se crucen los horarios.
 
+## Security
+
+> Written in English, as required for this deliverable.
+
+- **Authentication:** `POST /api/auth/login` returns a short-lived JWT (15 minutes by default) with the role as a claim. Send it as `Authorization: Bearer <token>`. `JWT_SECRET_KEY` is required and only comes from the environment.
+- **Authorization:** `@role_required` protects each route (`client`, `mechanic`, `admin`, `owner`). A missing or invalid token gets 401 and a wrong role gets 403.
+- **Token storage:** the frontend keeps the token in `sessionStorage`, not in `localStorage` or a cookie. It is cleared when the tab closes and there is no cookie for CSRF to abuse. The trade-off is that a script running on the page could read it, so rendered data is escaped.
+- **Controls:** see [docs/lab7/owasp-controls.md](docs/lab7/owasp-controls.md) for the OWASP API Security Top 10 2023 table, with files, tests and known limitations.
+- **Pipeline:** CI runs the tests, SonarCloud and mutation testing, and fails if the mutation score is below 50 %.
+- **Reporting:** please open a private security advisory on this repository instead of a public issue.
+
 ## Stack
 
 | Capa | Tecnología |
