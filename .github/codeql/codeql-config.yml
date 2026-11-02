@@ -1,0 +1,9 @@
+name: MecaTrack
+# Solo el producto. Las pruebas y las herramientas locales de evidencia quedan fuera,
+# igual que en sonar-project.properties.
+paths:
+  - backend
+  - frontend
+paths-ignore:
+  - backend/tests
+  - backend/migrations
