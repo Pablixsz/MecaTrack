@@ -56,7 +56,7 @@ function dibujarNav(usuario) {
 
   document.getElementById('btn-logout')?.addEventListener('click', async () => {
     try { await apiPost('/auth/logout', {}); } catch (_) { /* la sesión ya no existía */ }
-    sessionStorage.clear();
+    cerrarSesionLocal();
     window.location.href = '../index.html';
   });
 }

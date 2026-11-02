@@ -1,12 +1,28 @@
 // frontend/js/api.js
 // Wrapper centralizado de fetch. Ninguna otra página debe llamar fetch() directamente.
 
-// Mismo host que la página (127.0.0.1 o localhost): si no coinciden, el
-// navegador trata la API como otro sitio y no envía la cookie de sesión.
 const API_HOST = ['localhost', '127.0.0.1'].includes(window.location.hostname)
   ? window.location.hostname
   : '127.0.0.1';
 const API_BASE_URL = `http://${API_HOST}:5000`;
+const LOGIN_ENDPOINT = '/api/auth/login';
+
+// Security: the JWT lives in sessionStorage so it disappears when the tab closes, and it is
+// only ever sent in the Authorization header. Any script on the page could read it, so
+// rendered data must stay escaped (see esc() in ui.js) and tokens are short-lived.
+function guardarSesion(data) {
+  sessionStorage.setItem('access_token', data.access_token);
+  sessionStorage.setItem('user_id', data.user_id);
+  sessionStorage.setItem('role', data.role);
+}
+
+function cerrarSesionLocal() {
+  sessionStorage.clear();
+}
+
+function irAlLogin() {
+  window.location.href = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+}
 
 /**
  * Función base. Arma la petición, maneja JSON y centraliza errores.
@@ -16,9 +32,13 @@ const API_BASE_URL = `http://${API_HOST}:5000`;
 async function apiRequest(endpoint, options = {}) {
   const config = {
     method: options.method || 'GET',
-    credentials: 'include', // manda la cookie de sesión
     headers: {},
   };
+
+  const token = sessionStorage.getItem('access_token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
 
   // Si hay body, lo convertimos a JSON y avisamos el Content-Type
   if (options.body) {
@@ -40,6 +60,13 @@ async function apiRequest(endpoint, options = {}) {
     data = await response.json();
   } catch (_) {
     data = null;
+  }
+
+  // Token vencido o inválido (401) o rol sin permiso (403): de vuelta al login. Sin token,
+  // el 401 es normal en páginas públicas y cada página decide qué mostrar.
+  if ((response.status === 401 || response.status === 403) && token && endpoint !== LOGIN_ENDPOINT) {
+    cerrarSesionLocal();
+    irAlLogin();
   }
 
   if (!response.ok) {

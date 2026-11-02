@@ -27,11 +27,8 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
   errorEl.textContent = '';
 
   try {
-    const data = await apiPost('/auth/login', { email, password });
-
-    // Guardamos lo mínimo necesario para decidir navegación en otras páginas
-    sessionStorage.setItem('user_id', data.user_id);
-    sessionStorage.setItem('role', data.role);
+    const data = await apiPost(LOGIN_ENDPOINT, { email, password });
+    guardarSesion(data);
 
     redirigirSegunRol(data.role);
 
