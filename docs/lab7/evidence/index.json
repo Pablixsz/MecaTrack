@@ -89,5 +89,89 @@
     "description": "README con los badges de CI, Quality Gate y mutation score",
     "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/README.md",
     "captured_at": "2026-11-01T22:26:32-05:00"
+  },
+  {
+    "file": "06a-jwt-login-200.png",
+    "phase": "4",
+    "description": "POST /api/auth/login con credenciales validas: 200 y token",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' -X POST http://127.0.0.1:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@demo.test\",\"password\":\"test1234\"}'",
+    "captured_at": "2026-11-01T22:32:06-05:00"
+  },
+  {
+    "file": "06b-jwt-login-401.png",
+    "phase": "4",
+    "description": "POST /api/auth/login con contrasena incorrecta: 401 generico",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' -X POST http://127.0.0.1:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"admin@demo.test\",\"password\":\"incorrecta\"}'",
+    "captured_at": "2026-11-01T22:32:07-05:00"
+  },
+  {
+    "file": "06c-jwt-claims.png",
+    "phase": "4",
+    "description": "Claims del token: rol y expiracion corta",
+    "source": "echo \"$ADMIN_TOKEN\" | cut -d. -f2 | backend/venv/bin/python -c \"import sys,base64,json;p=sys.stdin.read().strip();print(json.dumps(json.loads(base64.urlsafe_b64decode(p+'='*(-len(p)%4))),indent=2))\"",
+    "captured_at": "2026-11-01T22:32:08-05:00"
+  },
+  {
+    "file": "07a-jwt-admin-200.png",
+    "phase": "4",
+    "description": "Endpoint ADMIN con token de admin: 200",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' http://127.0.0.1:5000/api/rbac/admin -H \"Authorization: Bearer $ADMIN_TOKEN\"",
+    "captured_at": "2026-11-01T22:32:08-05:00"
+  },
+  {
+    "file": "07b-jwt-admin-403.png",
+    "phase": "4",
+    "description": "Endpoint ADMIN con token de cliente: 403",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' http://127.0.0.1:5000/api/rbac/admin -H \"Authorization: Bearer $CLIENT_TOKEN\"",
+    "captured_at": "2026-11-01T22:32:09-05:00"
+  },
+  {
+    "file": "07c-jwt-user-200.png",
+    "phase": "4",
+    "description": "Endpoint USER con token de cliente: 200",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' http://127.0.0.1:5000/api/rbac/user -H \"Authorization: Bearer $CLIENT_TOKEN\"",
+    "captured_at": "2026-11-01T22:32:09-05:00"
+  },
+  {
+    "file": "07d-jwt-401-no-token.png",
+    "phase": "4",
+    "description": "Endpoint protegido sin token: 401",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' http://127.0.0.1:5000/api/rbac/user",
+    "captured_at": "2026-11-01T22:32:10-05:00"
+  },
+  {
+    "file": "07e-jwt-expired.png",
+    "phase": "4",
+    "description": "Token vencido (emitido con vida de 2 segundos): 401 token_expired",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' http://127.0.0.1:5001/api/rbac/user -H \"Authorization: Bearer $SHORT_TOKEN\"",
+    "captured_at": "2026-11-01T22:32:10-05:00"
+  },
+  {
+    "file": "07f-jwt-management-403.png",
+    "phase": "4",
+    "description": "Endpoint real de gestion (POST /bays) con token de cliente: 403",
+    "source": "curl -s -w '\\n[HTTP %{http_code}]\\n' -X POST http://127.0.0.1:5000/bays -H 'Content-Type: application/json' -H \"Authorization: Bearer $CLIENT_TOKEN\" -d '{\"bay_number\":\"Bahia 9\"}'",
+    "captured_at": "2026-11-01T22:32:11-05:00"
+  },
+  {
+    "file": "08a-frontend-login-admin.png",
+    "phase": "4",
+    "description": "Frontend: login de admin; las peticiones llevan Authorization: Bearer",
+    "source": "http://127.0.0.1:5500/pages/dashboard-admin.html",
+    "captured_at": "2026-11-01T22:32:12-05:00"
+  },
+  {
+    "file": "08b-frontend-401-redirect.png",
+    "phase": "4",
+    "description": "Frontend: con token invalido (401) borra la sesion y vuelve al login",
+    "source": "http://127.0.0.1:5500/index.html",
+    "captured_at": "2026-11-01T22:32:12-05:00"
+  },
+  {
+    "file": "08c-frontend-403-redirect.png",
+    "phase": "4",
+    "description": "Frontend: un cliente recibe 403 en /bays y vuelve al login",
+    "source": "http://127.0.0.1:5500/index.html",
+    "captured_at": "2026-11-01T22:32:13-05:00"
   }
 ]

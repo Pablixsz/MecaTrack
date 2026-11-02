@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' -X POST http://127.0.0.1:5000/api/auth/login -H 'Content-Type: application/json' -d '{"email":"admin@demo.test","password":"test1234"}'
+# cwd: . | exit 0
+
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc5MzU5MDMyNiwianRpIjoiZDQzZmY4YTEtZDEzOS00MzFhLWIxMjYtMjc0NTlkZTgxMGUwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjQiLCJuYmYiOjE3OTM1OTAzMjYsImNzcmYiOiJhMGEzMzQxYi1mZWYyLTQyZjUtYjA5NS1iZDcwYTM2MDU2NzEiLCJleHAiOjE3OTM1OTEyMjYsInJvbGUiOiJhZG1pbiJ9.2GVEpS58NTovqxu2ZjXigJGTbBviloSOHtsvn_onr1s","expires_in":900,"role":"admin","token_type":"Bearer","user_id":4}
+
+[HTTP 200]

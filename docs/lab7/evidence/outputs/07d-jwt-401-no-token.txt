@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' http://127.0.0.1:5000/api/rbac/user
+# cwd: . | exit 0
+
+{"code":"unauthorized","details":null,"message":"Authentication required: log in via POST /api/auth/login"}
+
+[HTTP 401]

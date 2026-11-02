@@ -1,0 +1,14 @@
+# echo "$ADMIN_TOKEN" | cut -d. -f2 | backend/venv/bin/python -c "import sys,base64,json;p=sys.stdin.read().strip();print(json.dumps(json.loads(base64.urlsafe_b64decode(p+'='*(-len(p)%4))),indent=2))"
+# cwd: . | exit 0
+
+{
+  "fresh": false,
+  "iat": 1793590323,
+  "jti": "538fb6a7-df9f-4bf3-8d45-4045cef8c613",
+  "type": "access",
+  "sub": "4",
+  "nbf": 1793590323,
+  "csrf": "5bc770f5-c69f-4b5a-a16c-4b657676c6bb",
+  "exp": 1793591223,
+  "role": "admin"
+}

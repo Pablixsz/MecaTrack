@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' -X POST http://127.0.0.1:5000/api/auth/login -H 'Content-Type: application/json' -d '{"email":"admin@demo.test","password":"incorrecta"}'
+# cwd: . | exit 0
+
+{"code":"unauthorized","details":null,"message":"Credenciales inv\u00e1lidas"}
+
+[HTTP 401]

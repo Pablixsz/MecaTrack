@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' http://127.0.0.1:5001/api/rbac/user -H "Authorization: Bearer $SHORT_TOKEN"
+# cwd: . | exit 0
+
+{"code":"token_expired","details":null,"message":"The token has expired: log in again"}
+
+[HTTP 401]

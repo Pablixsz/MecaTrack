@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' http://127.0.0.1:5000/api/rbac/user -H "Authorization: Bearer $CLIENT_TOKEN"
+# cwd: . | exit 0
+
+{"message":"Hello user","required_role":"client"}
+
+[HTTP 200]

@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' -X POST http://127.0.0.1:5000/bays -H 'Content-Type: application/json' -H "Authorization: Bearer $CLIENT_TOKEN" -d '{"bay_number":"Bahia 9"}'
+# cwd: . | exit 0
+
+{"error":"No tienes permiso para realizar esta acci\u00f3n"}
+
+[HTTP 403]

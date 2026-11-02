@@ -1,0 +1,6 @@
+# curl -s -w '\n[HTTP %{http_code}]\n' http://127.0.0.1:5000/api/rbac/admin -H "Authorization: Bearer $CLIENT_TOKEN"
+# cwd: . | exit 0
+
+{"code":"forbidden","details":{"required_roles":["admin"],"your_role":"client"},"message":"Your role is not allowed to perform this action"}
+
+[HTTP 403]
