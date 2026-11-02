@@ -1,9 +1,9 @@
 # PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest -q -o addopts= --disable-warnings --cov --cov-report=term --cov-report=xml
 # cwd: backend | exit 0
 
-.............................................................................................................. [ 46%]
-.............................................................................................................. [ 92%]
-...................                                                                                            [100%]
+.............................................................................................................. [ 45%]
+.............................................................................................................. [ 91%]
+.....................                                                                                          [100%]
 =================================================== tests coverage ===================================================
 __________________________________ coverage: platform linux, python 3.14.8-final-0 ___________________________________
 
@@ -22,7 +22,7 @@ app.py                                                                 23      2
 application/catalog/services.py                                       213     12     50      8    92%
 application/tracking/services.py                                       46      2     16      2    94%
 config.py                                                              59      1      2      1    97%
-domain/ai_assistant/answer.py                                          29      2     10      2    90%
+domain/ai_assistant/answer.py                                          33      2     12      2    91%
 domain/identity/entities.py                                            18      1      0      0    94%
 infrastructure/analytics/duckdb_analytics.py                           66      4      4      0    94%
 infrastructure/llm/gemini_gateway.py                                   49      2      6      0    96%
@@ -34,8 +34,8 @@ infrastructure/persistence/unit_of_work.py                             17      4
 infrastructure/resilience/circuit_breaker.py                          101      0     20      1    99%
 infrastructure/resilience/http_client.py                               36      2      4      0    95%
 -----------------------------------------------------------------------------------------------------
-TOTAL                                                                2689     49    328     32    97%
+TOTAL                                                                2693     49    330     32    97%
 
 96 files skipped due to complete coverage.
 Coverage XML written to file coverage.xml
-239 passed, 392 warnings in 35.74s
+241 passed, 392 warnings in 35.91s

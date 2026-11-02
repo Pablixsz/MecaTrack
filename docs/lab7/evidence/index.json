@@ -270,7 +270,7 @@
     "phase": "7",
     "description": "Verificacion final: pruebas y cobertura",
     "source": "PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest -q -o addopts= --disable-warnings --cov --cov-report=term --cov-report=xml",
-    "captured_at": "2026-11-01T22:54:51-05:00"
+    "captured_at": "2026-11-01T23:03:12-05:00"
   },
   {
     "file": "12b-final-mutation-score.png",
@@ -282,29 +282,29 @@
   {
     "file": "12c-final-sonar-overview.png",
     "phase": "7",
-    "description": "SonarCloud final: Quality Gate aprobado, sin bugs ni vulnerabilidades",
+    "description": "SonarCloud final: Quality Gate aprobado y sin issues de tipo bug ni vulnerabilidad",
     "source": "https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack",
-    "captured_at": "2026-11-01T22:55:29-05:00"
+    "captured_at": "2026-11-01T23:02:10-05:00"
   },
   {
     "file": "12d-final-sonar-new-code.png",
     "phase": "7",
     "description": "SonarCloud final: condiciones sobre el codigo nuevo",
     "source": "https://sonarcloud.io/summary/new_code?id=Pablixsz_MecaTrack",
-    "captured_at": "2026-11-01T22:55:39-05:00"
+    "captured_at": "2026-11-01T23:02:20-05:00"
   },
   {
     "file": "12e-final-actions.png",
     "phase": "7",
     "description": "GitHub Actions: ejecuciones de la rama mecatrack-final",
     "source": "https://github.com/Pablixsz/MecaTrack/actions?query=branch%3Amecatrack-final",
-    "captured_at": "2026-11-01T22:55:46-05:00"
+    "captured_at": "2026-11-01T23:02:27-05:00"
   },
   {
     "file": "12f-final-readme-badges.png",
     "phase": "7",
     "description": "README final con los badges",
     "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/README.md",
-    "captured_at": "2026-11-01T22:55:53-05:00"
+    "captured_at": "2026-11-01T23:02:34-05:00"
   }
 ]

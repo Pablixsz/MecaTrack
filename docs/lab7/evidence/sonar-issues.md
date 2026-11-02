@@ -18,3 +18,14 @@ Al cierre no quedan issues abiertos de tipo Bug ni Vulnerability. De ellos, 3 se
 | `pythonsecurity:S8701`, `S8707` y `S6350`; `javascript:S4036` en `scripts/` e `informe/` | MAJOR / MINOR | Herramientas locales de evidencia que ejecutan comandos por diseno; no son parte del producto | Fuera de `sonar.sources` al analizar desde CI. No se corrigen en el codigo | El alcance queda declarado en `sonar-project.properties` |
 | `python:S8786` en `domain/ai_assistant/answer.py:17` | Code smell (fiabilidad media) | Regex de tiempo superlineal sobre el texto del LLM | Se reemplaza el regex por operaciones de texto | `test_parse_model_answer_strips_markdown_fences` |
 | `javascript:S7773` (17) en `frontend/js/` | Code smell (fiabilidad media) | `parseInt` global | `Number.parseInt` | `node --check`; sin pruebas automatizadas de JS |
+
+## Riesgos de dependencias
+
+SonarCloud reporto 4 CVE en dependencias directas, aunque la pestana de Dependabot aun no mostraba alertas. Se actualizaron:
+
+| CVE | Paquete | Version vulnerable | Version nueva |
+|---|---|---|---|
+| CVE-2026-28684 | python-dotenv | 1.0.1 (`python-services`) | 1.2.4 |
+| CVE-2026-102991 | Mako | 1.4.1 | 1.4.3 |
+| CVE-2026-102598 | Werkzeug | 3.1.8 | 3.1.9 |
+| CVE-2026-27205 | Flask | 3.0.3 (`python-services`) | 3.1.3 |

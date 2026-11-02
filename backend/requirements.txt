@@ -11,13 +11,13 @@ Flask-SQLAlchemy==3.1.1
 greenlet==3.5.5
 itsdangerous==2.2.0
 Jinja2==3.1.6
-Mako==1.4.1
+Mako==1.4.3
 MarkupSafe==3.0.3
 psycopg2-binary==2.9.13
-python-dotenv==1.2.3
+python-dotenv==1.2.4
 SQLAlchemy==2.0.52
 typing_extensions==4.16.0
-Werkzeug==3.1.8
+Werkzeug==3.1.9
 flask-cors==6.0.5
 apispec==6.10.0
 flask-smorest==0.47.0
