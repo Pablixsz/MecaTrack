@@ -27,3 +27,13 @@ pytest-report.xml
 
 # Descargas de datos abiertos (se regeneran con POST /api/v1/market/refresh)
 backend/var/
+
+# Guia 7: perfil de Firefox con cookies de sesion (vive en ~/, nunca al repo)
+.mecatrack-firefox-profile/
+scripts/evidence/node_modules/
+
+# Cobertura y mutation testing
+.coverage
+coverage.xml
+backend/mutants/
+.mutmut-cache

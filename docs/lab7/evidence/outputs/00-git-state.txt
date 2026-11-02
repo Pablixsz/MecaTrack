@@ -1,0 +1,9 @@
+# git log --oneline -5 && git branch --show-current
+# cwd: . | exit 0
+
+a636547 Informe Guia 6: actualiza documento Word
+ba80d21 Informe Guia 6: integrantes y enlace de video
+0ddf048 Informe Guia 6: completa nombre, conclusion de negocio, dificultad, Copilot, enlaces y declaracion de IA
+03ae65a Guia 6: evidencia e informe finales (128 pruebas, CI run 40166749058) y uso de IA del rol administrador
+875ef36 Rol administrador: recepcion de clientes, vehiculos y citas a su nombre
+mecatrack-final

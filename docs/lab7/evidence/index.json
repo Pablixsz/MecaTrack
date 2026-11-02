@@ -1,0 +1,9 @@
+[
+  {
+    "file": "00-git-state.png",
+    "phase": "0",
+    "description": "Estado inicial de la rama antes de la Guia 7",
+    "source": "git log --oneline -5 && git branch --show-current",
+    "captured_at": "2026-11-01T21:09:39-05:00"
+  }
+]
