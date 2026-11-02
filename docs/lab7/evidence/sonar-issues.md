@@ -2,6 +2,8 @@
 
 Primer analisis (automatico) de `Pablixsz_MecaTrack`: 32 bugs y 15 vulnerabilidades. Figuras 01a y 01b.
 
+Al cierre no quedan issues abiertos de tipo Bug ni Vulnerability. De ellos, 3 se cerraron en SonarCloud como falso positivo y 2 como aceptados, con justificacion escrita; otros salieron del alcance del analisis. Siguen abiertos code smells sin severidad alta, entre ellos 2 de accesibilidad (`Web:S6843` en `mercado.html`) con impacto en fiabilidad.
+
 | Issue | Severidad | Causa | Tratamiento | Test / verificacion |
 |---|---|---|---|---|
 | `pythonsecurity:S5131` en `api/v1/services.py:161` y `api/v1/ai.py:90` | BLOCKER | Sonar ve datos del usuario devueltos en la respuesta. Se serializan como JSON, por lo que no hay HTML reflejado directo | Se anade `X-Content-Type-Options: nosniff` a todas las respuestas para impedir que el navegador interpretara el JSON como HTML, y se marca como falso positivo en SonarCloud con esa justificacion | `test_user_input_is_echoed_only_as_non_sniffable_json`: comprobado que falla sin el arreglo |
@@ -14,3 +16,5 @@ Primer analisis (automatico) de `Pablixsz_MecaTrack`: 32 bugs y 15 vulnerabilida
 | `shell:S6505` en `scripts/run_all.sh` y `scripts/generar_evidencia.sh` | MAJOR | `npm install` ejecutaba scripts de ciclo de vida | `--ignore-scripts` | Reanalisis de Sonar |
 | `python:S5332` (2) en `config.py:13` | MINOR | Origenes CORS `http://` solo de loopback para desarrollo | Aceptado en SonarCloud con justificacion: produccion los define con `CORS_ORIGINS` | `test_api8_cors_rejects_unknown_origins_and_never_allows_credentials` |
 | `pythonsecurity:S8701`, `S8707` y `S6350`; `javascript:S4036` en `scripts/` e `informe/` | MAJOR / MINOR | Herramientas locales de evidencia que ejecutan comandos por diseno; no son parte del producto | Fuera de `sonar.sources` al analizar desde CI. No se corrigen en el codigo | El alcance queda declarado en `sonar-project.properties` |
+| `python:S8786` en `domain/ai_assistant/answer.py:17` | Code smell (fiabilidad media) | Regex de tiempo superlineal sobre el texto del LLM | Se reemplaza el regex por operaciones de texto | `test_parse_model_answer_strips_markdown_fences` |
+| `javascript:S7773` (17) en `frontend/js/` | Code smell (fiabilidad media) | `parseInt` global | `Number.parseInt` | `node --check`; sin pruebas automatizadas de JS |

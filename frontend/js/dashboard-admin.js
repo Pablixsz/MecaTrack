@@ -232,8 +232,8 @@ document.getElementById('tabla-repuestos').addEventListener('click', async (e) =
   if (e.target.classList.contains('btn-guardar-repuesto')) {
     body = {
       part_name: fila.querySelector('.rep-nombre').value.trim(),
-      unit_price: parseInt(fila.querySelector('.rep-precio').value),
-      stock_quantity: parseInt(fila.querySelector('.rep-stock').value),
+      unit_price: Number.parseInt(fila.querySelector('.rep-precio').value),
+      stock_quantity: Number.parseInt(fila.querySelector('.rep-stock').value),
     };
   } else if (e.target.classList.contains('btn-estado-repuesto')) {
     body = { status: e.target.dataset.status };
@@ -253,8 +253,8 @@ document.getElementById('form-repuesto').addEventListener('submit', async (e) =>
   try {
     await apiPost('/parts', {
       part_name: document.getElementById('repuesto-nombre').value.trim(),
-      unit_price: parseInt(document.getElementById('repuesto-precio').value),
-      stock_quantity: parseInt(document.getElementById('repuesto-stock').value),
+      unit_price: Number.parseInt(document.getElementById('repuesto-precio').value),
+      stock_quantity: Number.parseInt(document.getElementById('repuesto-stock').value),
     });
     e.target.reset();
     mostrarExito('Repuesto creado.');
@@ -299,8 +299,8 @@ document.getElementById('tabla-servicios').addEventListener('click', async (e) =
     body = {
       service_name: fila.querySelector('.serv-nombre').value.trim(),
       description: fila.querySelector('.serv-descripcion').value.trim() || null,
-      estimated_duration_minutes: parseInt(fila.querySelector('.serv-duracion').value),
-      base_price: parseInt(fila.querySelector('.serv-precio').value),
+      estimated_duration_minutes: Number.parseInt(fila.querySelector('.serv-duracion').value),
+      base_price: Number.parseInt(fila.querySelector('.serv-precio').value),
     };
   } else if (e.target.classList.contains('btn-estado-servicio')) {
     body = { status: e.target.dataset.status };
@@ -321,8 +321,8 @@ document.getElementById('form-servicio').addEventListener('submit', async (e) =>
     await apiPost('/services', {
       service_name: document.getElementById('servicio-nombre').value.trim(),
       description: document.getElementById('servicio-descripcion').value.trim() || null,
-      estimated_duration_minutes: parseInt(document.getElementById('servicio-duracion').value),
-      base_price: parseInt(document.getElementById('servicio-precio').value),
+      estimated_duration_minutes: Number.parseInt(document.getElementById('servicio-duracion').value),
+      base_price: Number.parseInt(document.getElementById('servicio-precio').value),
     });
     e.target.reset();
     mostrarExito('Servicio creado.');
@@ -518,7 +518,7 @@ $('form-vehiculo-cliente').addEventListener('submit', async (e) => {
       license_plate: $('rv-placa').value.trim().toUpperCase(),
       brand: $('rv-marca').value.trim(),
       model: $('rv-modelo').value.trim(),
-      year: parseInt($('rv-anio').value, 10),
+      year: Number.parseInt($('rv-anio').value, 10),
       vehicle_type: $('rv-tipo').value,
       fuel_type: $('rv-combustible').value,
       transmission_type: $('rv-transmision').value,
@@ -538,8 +538,8 @@ $('form-cita-recepcion').addEventListener('submit', async (e) => {
   try {
     const cita = await apiPost('/appointments', {
       client_user_id: clienteRecepcion.user_id,
-      vehicle_id: parseInt($('select-vehiculo-cliente').value, 10),
-      service_id: parseInt($('rc-servicio').value, 10),
+      vehicle_id: Number.parseInt($('select-vehiculo-cliente').value, 10),
+      service_id: Number.parseInt($('rc-servicio').value, 10),
       scheduled_start: `${$('rc-fecha').value}:00`,
       payment_method: $('rc-pago').value,
     });

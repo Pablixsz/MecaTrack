@@ -114,7 +114,7 @@ document.getElementById('form-agendar').addEventListener('submit', async (e) => 
         license_plate: document.getElementById('veh-placa').value,
         brand: document.getElementById('veh-marca').value,
         model: document.getElementById('veh-modelo').value,
-        year: parseInt(document.getElementById('veh-anio').value),
+        year: Number.parseInt(document.getElementById('veh-anio').value),
         vehicle_type: document.getElementById('veh-tipo').value,
         fuel_type: document.getElementById('veh-combustible').value,
         transmission_type: document.getElementById('veh-transmision').value,
@@ -131,7 +131,7 @@ document.getElementById('form-agendar').addEventListener('submit', async (e) => 
 
     const cita = await apiPost('/appointments', {
       vehicle_id: vehicleId,
-      service_id: parseInt(serviceId),
+      service_id: Number.parseInt(serviceId),
       scheduled_start: fechaHora,
     });
 

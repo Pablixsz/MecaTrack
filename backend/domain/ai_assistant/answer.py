@@ -1,7 +1,6 @@
 """Validacion de la respuesta JSON del modelo (defensa contra alucinaciones)."""
 
 import json
-import re
 
 from domain.ai_assistant import prompts
 from domain.ai_assistant.errors import InvalidModelResponse
@@ -9,12 +8,20 @@ from domain.ai_assistant.errors import InvalidModelResponse
 CONFIDENCE_LEVELS = ('high', 'medium', 'low')
 
 
+def _strip_code_fence(text):
+    """Quita las cercas ``` del modelo sin regex: su texto no es confiable y no debe poder ralentizar el parseo."""
+    cleaned = text.strip()
+    if cleaned.startswith('```'):
+        cleaned = cleaned[3:].removeprefix('json')
+    return cleaned.removesuffix('```').strip()
+
+
 def parse_model_answer(text, allowed_ids):
     """
     Devuelve (sugerencias, notes, reasoning, descartados). Los service_id que
     no estaban en el contexto se descartan: el modelo no puede inventar servicios.
     """
-    cleaned = re.sub(r'(?:^```(?:json)?\s*)|(?:\s*```$)', '', text.strip())
+    cleaned = _strip_code_fence(text)
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError as exc:

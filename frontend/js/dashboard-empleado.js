@@ -256,14 +256,14 @@ listaCitas.addEventListener('submit', async (e) => {
   const partsUsed = [];
   tarjeta.querySelectorAll('.check-parte:checked').forEach(chk => {
     const cantidad = chk.closest('.fila-parte').querySelector('.cantidad-parte').value;
-    partsUsed.push({ part_id: parseInt(chk.value), quantity: parseInt(cantidad) });
+    partsUsed.push({ part_id: Number.parseInt(chk.value), quantity: Number.parseInt(cantidad) });
   });
 
   const body = {
     status: e.target.querySelector('.tracking-estado').value,
     notes: e.target.querySelector('.tracking-notas').value || null,
     current_mileage: e.target.querySelector('.tracking-kilometraje').value
-      ? parseInt(e.target.querySelector('.tracking-kilometraje').value)
+      ? Number.parseInt(e.target.querySelector('.tracking-kilometraje').value)
       : null,
   };
   if (partsUsed.length > 0) {

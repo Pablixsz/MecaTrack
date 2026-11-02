@@ -114,7 +114,7 @@ document.getElementById('form-editar-vehiculo').addEventListener('submit', async
       license_plate: document.getElementById('edit-veh-placa').value,
       brand: document.getElementById('edit-veh-marca').value,
       model: document.getElementById('edit-veh-modelo').value,
-      year: parseInt(document.getElementById('edit-veh-anio').value),
+      year: Number.parseInt(document.getElementById('edit-veh-anio').value),
     });
     bloqueEditar.classList.add('oculto');
     cargarVehiculos().catch(errorNoControlado);

@@ -67,6 +67,8 @@ def test_quota_uses_the_injected_clock(deps, fixed_now):
     '{"suggestions": []}',
     '```json\n{"suggestions": []}\n```',
     '```\n{"suggestions": []}\n```',
+    '```json{"suggestions": []}',
+    '{"suggestions": []}```',
 ])
 def test_parse_model_answer_strips_markdown_fences(text):
     assert parse_model_answer(text, set())[0] == []

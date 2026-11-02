@@ -4,7 +4,7 @@
 "This is MecaTrack, a booking and vehicle tracking system for a car repair workshop. In this lab we hardened its quality and security pipeline."
 
 **2. SonarCloud (30 s)** - Open the project summary.
-"The first analysis found 32 bugs and 15 vulnerabilities. The Quality Gate now passes, with zero open bugs and vulnerabilities and 97 percent coverage. Three findings were closed with a written justification instead of a code change, and evidence tooling is outside the analysis scope."
+"The first analysis found 32 bugs and 15 vulnerabilities. The Quality Gate now passes, with no open issues of type bug or vulnerability and 97 percent coverage. Some code smells remain open, and five findings were closed with a written justification instead of a code change. Evidence tooling is outside the analysis scope."
 
 **3. Mutation testing (20 s)** - Show the CI run and the failing demo.
 "Mutmut went from 62.6 to 98.4 percent on the scheduling and payment logic. If the score drops below 50 percent, the build fails. Here is that failure on a temporary branch."
