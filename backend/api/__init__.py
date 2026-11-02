@@ -7,10 +7,8 @@ serializan la respuesta. Las reglas de negocio viven en application/domain.
 - api/v1:     API REST documentada con OpenAPI (errores {"code","message","details"}).
 """
 
-from flask import jsonify
-
-from api.auth import login_manager
-from api.errors import ApiError, error_response, handle_domain_error, is_api_request
+from api.auth import jwt
+from api.errors import handle_domain_error
 from domain.shared.errors import DomainError
 
 LEGACY_BLUEPRINTS = (
@@ -23,13 +21,15 @@ LEGACY_BLUEPRINTS = (
     ('api.legacy.appointment_routes', 'appointment_bp', '/appointments'),
     ('api.legacy.payment_routes', 'payment_bp', '/payments'),
     ('api.legacy.service_tracking_routes', 'tracking_bp', '/tracking'),
+    ('api.jwt_routes', 'jwt_auth_bp', '/api/auth'),
+    ('api.jwt_routes', 'rbac_bp', '/api/rbac'),
 )
 
 
 def register_api(app):
     from importlib import import_module
 
-    login_manager.init_app(app)
+    jwt.init_app(app)
     app.register_error_handler(DomainError, handle_domain_error)
 
     for module, name, prefix in LEGACY_BLUEPRINTS:
@@ -45,9 +45,3 @@ def register_api(app):
         # The API only serves JSON: browsers must not sniff it into executable HTML.
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
-
-    @login_manager.unauthorized_handler
-    def unauthorized():
-        if is_api_request():
-            return error_response(ApiError(401, 'unauthorized', 'Authentication required: log in via POST /auth/login'))
-        return jsonify({'error': 'Debes iniciar sesión para acceder a este recurso'}), 401

@@ -35,7 +35,7 @@ def test_register_validates_and_rejects_duplicates(app):
     assert (duplicate.status_code, duplicate.get_json()) == (409, {'error': 'Ese correo ya está registrado'})
     same_doc = anonymous.post('/auth/register', json={**body, 'email': 'otra@test.com'})
     assert same_doc.status_code == 409 and 'documento' in same_doc.get_json()['error']
-    assert anonymous.post('/auth/login', json={'email': 'ana@test.com', 'password': 'secreto1'}).get_json()[
+    assert anonymous.post('/api/auth/login', json={'email': 'ana@test.com', 'password': 'secreto1'}).get_json()[
         'role'] == 'client'
 
 
@@ -61,8 +61,8 @@ def test_owner_manages_business_and_mechanics(app, login):
     assert mechanics[mechanic_id]['status'] == 'inactive' and mechanics[2]['status'] == 'active'
 
     # Un mecanico inactivo no puede iniciar sesion
-    inactive = app.test_client().post('/auth/login', json={'email': 'luis@test.com', 'password': 'clave123'})
-    assert (inactive.status_code, inactive.get_json()) == (403, {'error': 'Tu cuenta está inactiva'})
+    inactive = app.test_client().post('/api/auth/login', json={'email': 'luis@test.com', 'password': 'clave123'})
+    assert (inactive.status_code, inactive.get_json()['message']) == (403, 'Tu cuenta está inactiva')
     assert login('client@test.com').get('/businesses/mine').status_code == 403
 
 

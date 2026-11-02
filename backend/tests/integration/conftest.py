@@ -99,10 +99,11 @@ def block_real_llm(monkeypatch):
 
 @pytest.fixture
 def login(app):
-    """Devuelve un test_client con la sesion (cookie) del usuario indicado."""
+    """Devuelve un test_client que envia el JWT del usuario indicado en cada peticion."""
     def _login(email):
         client = app.test_client()
-        response = client.post('/auth/login', json={'email': email, 'password': PASSWORD})
+        response = client.post('/api/auth/login', json={'email': email, 'password': PASSWORD})
         assert response.status_code == 200, response.get_json()
+        client.environ_base['HTTP_AUTHORIZATION'] = f"Bearer {response.get_json()['access_token']}"
         return client
     return _login

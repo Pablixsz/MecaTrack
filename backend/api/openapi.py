@@ -17,25 +17,40 @@ API_DESCRIPTION = """
 REST API of **MecaTrack**, a booking and vehicle-tracking system for a car repair workshop.
 
 * **Errors** always use the same JSON body: `{"code": "...", "message": "...", "details": ...}`.
-* **Authentication** is a session cookie. In Swagger UI, call `POST /auth/login` first
-  (for example with `carlos.owner@tallermecanico.com` / `test1234`, the test owner listed in the README);
-  the browser keeps the cookie and sends it on the following requests.
+* **Authentication** is a JWT Bearer token. Call `POST /api/auth/login`, then send
+  `Authorization: Bearer <access_token>` (Swagger UI: **Authorize**). Tokens are short-lived.
 * **Roles**: reading the catalog is public; creating, replacing or deleting services
   requires the `owner` or `admin` role, and so does the open-data market panel (`/api/v1/market`).
 """.strip()
 
-# /auth/login y /auth/logout son rutas antiguas (no smorest). Se documentan a
-# mano para que Swagger UI pueda iniciar sesion y probar POST/PUT/DELETE.
-LEGACY_ERROR = {'type': 'object', 'properties': {'error': {
-    'type': 'string', 'description': 'Error message in Spanish (legacy format of the /auth routes).',
-    'example': 'Credenciales inválidas'}}}
+# Rutas fuera de smorest: se documentan a mano para que aparezcan en Swagger UI.
+API_ERROR = {'type': 'object', 'properties': {
+    'code': {'type': 'string', 'description': 'Stable error code.', 'example': 'invalid_credentials'},
+    'message': {'type': 'string', 'description': 'Readable message.', 'example': 'Credenciales inválidas'},
+    'details': {'type': 'object', 'nullable': True, 'description': 'Extra data, if any.', 'example': None}}}
+
+
+def _error_response(description, code, message):
+    return {'description': description, 'content': {'application/json': {
+        'schema': API_ERROR, 'example': {'code': code, 'message': message, 'details': None}}}}
+
+
+def _message_response(description, schema_example):
+    return {'description': description, 'content': {'application/json': {
+        'schema': {'type': 'object'}, 'example': schema_example}}}
+
+
+NO_TOKEN = _error_response('Missing, expired or invalid token.', 'unauthorized',
+                           'Authentication required: log in via POST /api/auth/login')
+WRONG_ROLE = _error_response('The role of the token is not allowed.', 'forbidden',
+                             'Your role is not allowed to perform this action')
 
 AUTH_PATHS = {
-    '/auth/login': {'post': {
+    '/api/auth/login': {'post': {
         'tags': ['Auth'],
         'summary': 'Log in',
-        'description': 'Starts a session and sets the `session` cookie used by the protected endpoints. '
-                       'This is a pre-existing route, so its errors use the legacy `{"error": "..."}` body.',
+        'description': 'Returns a short-lived JWT access token with the user role as a claim. '
+                       'Send it as `Authorization: Bearer <access_token>`.',
         'requestBody': {'required': True, 'content': {'application/json': {
             'schema': {'type': 'object', 'required': ['email', 'password'], 'properties': {
                 'email': {'type': 'string', 'format': 'email', 'description': 'Account email.',
@@ -44,35 +59,46 @@ AUTH_PATHS = {
                              'example': 'test1234'}}},
             'example': {'email': 'carlos.owner@tallermecanico.com', 'password': 'test1234'}}}},
         'responses': {
-            '200': {'description': 'Session started; the response sets the `session` cookie.',
-                    'content': {'application/json': {
-                        'schema': {'type': 'object', 'properties': {
-                            'message': {'type': 'string', 'description': 'Confirmation message.',
-                                        'example': 'Sesión iniciada'},
-                            'user_id': {'type': 'integer', 'description': 'Id of the logged-in user.', 'example': 1},
-                            'role': {'type': 'string', 'description': 'Role of the user.', 'example': 'owner'}}},
-                        'example': {'message': 'Sesión iniciada', 'user_id': 1, 'role': 'owner'}}}},
-            '400': {'description': 'Email or password missing.', 'content': {'application/json': {
-                'schema': LEGACY_ERROR, 'example': {'error': 'Correo y contraseña son obligatorios'}}}},
-            '401': {'description': 'Wrong credentials.', 'content': {'application/json': {
-                'schema': LEGACY_ERROR, 'example': {'error': 'Credenciales inválidas'}}}},
-            '403': {'description': 'The account is inactive.', 'content': {'application/json': {
-                'schema': LEGACY_ERROR, 'example': {'error': 'Tu cuenta está inactiva'}}}},
+            '200': {'description': 'Credentials accepted.', 'content': {'application/json': {
+                'schema': {'type': 'object', 'properties': {
+                    'access_token': {'type': 'string', 'description': 'Signed JWT.', 'example': 'eyJhbGciOi...'},
+                    'token_type': {'type': 'string', 'description': 'Always Bearer.', 'example': 'Bearer'},
+                    'expires_in': {'type': 'integer', 'description': 'Lifetime in seconds.', 'example': 900},
+                    'user_id': {'type': 'integer', 'description': 'Id of the user.', 'example': 1},
+                    'role': {'type': 'string', 'description': 'Role of the user.', 'example': 'owner'}}},
+                'example': {'access_token': 'eyJhbGciOi...', 'token_type': 'Bearer', 'expires_in': 900,
+                            'user_id': 1, 'role': 'owner'}}}},
+            '400': _error_response('Email or password missing.', 'bad_request', 'email and password are required'),
+            '401': _error_response('Wrong credentials.', 'invalid_credentials', 'Credenciales inválidas'),
+            '403': _error_response('The account is inactive.', 'forbidden', 'Tu cuenta está inactiva'),
         }}},
     '/auth/logout': {'post': {
         'tags': ['Auth'],
         'summary': 'Log out',
-        'description': 'Ends the current session. Pre-existing route (legacy error format).',
-        'security': [{'cookieAuth': []}],
+        'description': 'Revokes the token used in this request.',
+        'security': [{'bearerAuth': []}],
         'responses': {
-            '200': {'description': 'Session closed.', 'content': {'application/json': {
-                'schema': {'type': 'object', 'properties': {'message': {
-                    'type': 'string', 'description': 'Confirmation message.', 'example': 'Sesión cerrada'}}},
-                'example': {'message': 'Sesión cerrada'}}}},
-            '401': {'description': 'There was no active session.', 'content': {'application/json': {
-                'schema': LEGACY_ERROR,
+            '200': _message_response('Token revoked.', {'message': 'Sesión cerrada'}),
+            '401': {'description': 'Missing, expired or invalid token.', 'content': {'application/json': {
+                'schema': {'type': 'object', 'properties': {'error': {
+                    'type': 'string', 'description': 'Error message in Spanish (legacy format of the /auth routes).',
+                    'example': 'Debes iniciar sesión para acceder a este recurso'}}},
                 'example': {'error': 'Debes iniciar sesión para acceder a este recurso'}}}},
         }}},
+    '/api/rbac/admin': {'get': {
+        'tags': ['Auth'],
+        'summary': 'Admin-only test endpoint',
+        'description': 'Demonstrates RBAC: only the `admin` role gets 200.',
+        'security': [{'bearerAuth': []}],
+        'responses': {'200': _message_response('Allowed.', {'message': 'Hello admin', 'required_role': 'admin'}),
+                      '401': NO_TOKEN, '403': WRONG_ROLE}}},
+    '/api/rbac/user': {'get': {
+        'tags': ['Auth'],
+        'summary': 'User-only test endpoint',
+        'description': 'Demonstrates RBAC: only the `client` role gets 200.',
+        'security': [{'bearerAuth': []}],
+        'responses': {'200': _message_response('Allowed.', {'message': 'Hello user', 'required_role': 'client'}),
+                      '401': NO_TOKEN, '403': WRONG_ROLE}}},
 }
 
 
@@ -100,10 +126,10 @@ def init_api(app):
         'info': {'description': API_DESCRIPTION,
                  'contact': {'name': 'MecaTrack team - Universidad Manuela Beltran'}},
         'servers': [{'url': 'http://127.0.0.1:5000', 'description': 'Local development server'}],
-        'tags': [{'name': 'Auth', 'description': 'Session management (pre-existing routes).'}],
-        'components': {'securitySchemes': {'cookieAuth': {
-            'type': 'apiKey', 'in': 'cookie', 'name': 'session',
-            'description': 'Flask session cookie returned by POST /auth/login.'}}},
+        'tags': [{'name': 'Auth', 'description': 'JWT login, logout and RBAC test endpoints.'}],
+        'components': {'securitySchemes': {'bearerAuth': {
+            'type': 'http', 'scheme': 'bearer', 'bearerFormat': 'JWT',
+            'description': 'Access token returned by POST /api/auth/login.'}}},
     })
     api.init_app(app)
     # smorest registra siempre el esquema de paginacion; esta API no pagina,

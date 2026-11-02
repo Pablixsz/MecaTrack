@@ -43,8 +43,8 @@ def test_admin_registers_a_new_client_vehicle_and_books_for_them(app, admin):
 
     # La cliente inicia sesion con la contraseña inicial y ve SU cita
     client = app.test_client()
-    assert client.post('/auth/login', json={'email': 'marta@test.com', 'password': 'inicial123'}).status_code == 200
-    [appointment] = client.get('/appointments').get_json()
+    token = client.post('/api/auth/login', json={'email': 'marta@test.com', 'password': 'inicial123'}).get_json()
+    [appointment] = client.get('/appointments', headers={'Authorization': f"Bearer {token['access_token']}"}).get_json()
     assert (appointment['client_name'], appointment['vehicle_plate']) == ('Marta Rojas', 'MRT555')
 
 

@@ -27,7 +27,7 @@ def test_login_and_role_based_access(app, login):
     anonymous = app.test_client()
 
     # Credenciales invalidas y rutas protegidas sin sesion
-    bad = anonymous.post('/auth/login', json={'email': 'client@test.com', 'password': 'mala'})
+    bad = anonymous.post('/api/auth/login', json={'email': 'client@test.com', 'password': 'mala'})
     assert bad.status_code == 401
     assert anonymous.get('/appointments').status_code == 401
 
@@ -43,7 +43,7 @@ def test_login_and_role_based_access(app, login):
     bays = owner.get('/bays').get_json()
     assert [b['bay_number'] for b in bays] == ['Bahia 1', 'Bahia 2']
 
-    # Logout invalida la sesion
+    # Logout revoca el token
     assert client.post('/auth/logout').status_code == 200
     assert client.get('/appointments').status_code == 401
 

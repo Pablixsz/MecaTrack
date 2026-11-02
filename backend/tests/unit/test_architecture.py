@@ -19,7 +19,7 @@ LAYERS = ('domain', 'application', 'api', 'infrastructure')
 
 # Librerias de framework, persistencia o IO prohibidas en el nucleo.
 FRAMEWORK_AND_IO = {
-    'flask', 'flask_login', 'flask_sqlalchemy', 'flask_migrate', 'flask_smorest', 'flask_cors', 'werkzeug',
+    'flask', 'flask_jwt_extended', 'flask_sqlalchemy', 'flask_migrate', 'flask_smorest', 'flask_cors', 'werkzeug',
     'sqlalchemy', 'alembic', 'psycopg2', 'marshmallow', 'webargs', 'apispec',
     'requests', 'httpx', 'urllib3', 'aiohttp', 'google', 'duckdb', 'dotenv',
     'socket', 'http', 'urllib', 'subprocess', 'sqlite3', 'shutil',

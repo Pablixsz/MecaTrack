@@ -53,6 +53,7 @@ jobs:
       # create_app() exige una URL aunque la exportacion del spec no consulte la base.
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/taller_mecanico_test
       SECRET_KEY: ci-only-secret
+      JWT_SECRET_KEY: ci-only-jwt-signing-key-with-enough-length
       # Sin key del LLM a proposito: las pruebas de /api/v1/ai lo simulan (mock)
       # y nunca deben llamar al proveedor real.
       GEMINI_API_KEY: ''

@@ -31,9 +31,9 @@ def _error(status, description, example):
 
 
 def _auth_errors(func):
-    func = _error(401, 'No active session. Log in with POST /auth/login first.', UNAUTHORIZED_EXAMPLE)(func)
-    func = _error(403, 'The session role is not `owner` or `admin`.', FORBIDDEN_EXAMPLE)(func)
-    return blp.doc(security=[{'cookieAuth': []}])(func)
+    func = _error(401, 'Missing or invalid token. Log in with POST /api/auth/login first.', UNAUTHORIZED_EXAMPLE)(func)
+    func = _error(403, 'The token role is not `owner` or `admin`.', FORBIDDEN_EXAMPLE)(func)
+    return blp.doc(security=[{'bearerAuth': []}])(func)
 
 
 def _not_loaded(func):
@@ -61,7 +61,7 @@ class Sources(MethodView):
         Returns each Colombian open-data source (RUNT vehicle fleet and DIVIPOLA
         from datos.gov.co, CNPV 2018 population from the DANE geoportal) with
         its last downloaded snapshot, plus the state of the circuit breaker
-        that protects each external host. Requires an `owner` or `admin` session.
+        that protects each external host. Requires an `owner` or `admin` token.
         """
         service = container().market_data
         snapshots = service.snapshots()
@@ -92,7 +92,7 @@ class Refresh(MethodView):
         exponential backoff and jitter, and each host has a circuit breaker
         (3 consecutive failures open it for 30 s). A failing source does not
         stop the others and keeps its previous snapshot. Always answers 200;
-        check `ok` per source. Requires an `owner` or `admin` session.
+        check `ok` per source. Requires an `owner` or `admin` token.
         """
         results = container().market_data.refresh()
         return {'results': [asdict(r) for r in results], 'circuits': _circuits()}

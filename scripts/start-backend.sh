@@ -18,7 +18,7 @@ if [ ! -d venv ]; then
   python3 -m venv venv
   venv/bin/pip install --quiet --upgrade pip
   venv/bin/pip install --quiet -r requirements.txt
-elif ! venv/bin/python -c "import flask, flask_migrate, flask_login, flask_cors, psycopg2" 2>/dev/null; then
+elif ! venv/bin/python -c "import flask, flask_migrate, flask_jwt_extended, flask_cors, psycopg2" 2>/dev/null; then
   echo "==> Instalando dependencias faltantes"
   venv/bin/pip install --quiet -r requirements.txt
 fi

@@ -26,7 +26,7 @@ WRITE_ROLES = ('owner', 'admin')
 # role_required va por fuera de los decoradores de smorest: primero se valida
 # la sesion (401/403) y despues el cuerpo (422). functools.wraps conserva la
 # documentacion OpenAPI que smorest guarda en la funcion.
-AUTH_DOC = {'security': [{'cookieAuth': []}]}
+AUTH_DOC = {'security': [{'bearerAuth': []}]}
 
 # --- Ejemplos para Swagger UI ------------------------------------------------
 
@@ -68,11 +68,11 @@ def invalid_body():
 
 
 def unauthorized():
-    return _error(401, 'No active session. Log in with POST /auth/login first.', UNAUTHORIZED_EXAMPLE)
+    return _error(401, 'Missing or invalid token. Log in with POST /api/auth/login first.', UNAUTHORIZED_EXAMPLE)
 
 
 def forbidden():
-    return _error(403, 'The session role is not `owner` or `admin`.', FORBIDDEN_EXAMPLE)
+    return _error(403, 'The token role is not `owner` or `admin`.', FORBIDDEN_EXAMPLE)
 
 
 def duplicate():
@@ -121,7 +121,7 @@ class ServiceCollection(MethodView):
         Adds a new service to the catalog of the authenticated user's
         workshop. `service_name`, `estimated_duration_minutes` and
         `base_price` are required; `status` defaults to `active`.
-        Requires an `owner` or `admin` session (cookie from POST /auth/login).
+        Requires an `owner` or `admin` token (from POST /api/auth/login).
         """
         return container().catalog.create(actor(), data)
 
@@ -156,7 +156,7 @@ class ServiceItem(MethodView):
         Replaces every editable field of the service. This is a full
         replacement, not a partial update: omitted optional fields go back to
         their defaults. To retire a service that already has appointments,
-        send `status: inactive`. Requires an `owner` or `admin` session.
+        send `status: inactive`. Requires an `owner` or `admin` token.
         """
         return container().catalog.replace(service_id, data)
 
@@ -173,6 +173,6 @@ class ServiceItem(MethodView):
         Permanently deletes a service that has never been booked. If any
         appointment references it the API answers 409, because deleting it
         would orphan those appointments; deactivate it with PUT
-        (`status: inactive`) instead. Requires an `owner` or `admin` session.
+        (`status: inactive`) instead. Requires an `owner` or `admin` token.
         """
         container().catalog.delete(service_id)

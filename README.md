@@ -15,7 +15,7 @@ Cuando se agenda una cita, el **motor de agendamiento** (`backend/domain/schedul
 | Capa | Tecnología |
 |---|---|
 | Frontend | HTML / CSS / JavaScript vanilla (sin frameworks) — `127.0.0.1:5500` (o Live Server) |
-| Backend | Flask 3 + Flask-SQLAlchemy + Flask-Migrate (Alembic) + Flask-Login (cookies) + Flask-CORS — `127.0.0.1:5000` |
+| Backend | Flask 3 + Flask-SQLAlchemy + Flask-Migrate (Alembic) + Flask-JWT-Extended (Bearer) + Flask-CORS — `127.0.0.1:5000` |
 | Base de datos | PostgreSQL (`taller_mecanico`) |
 | Pruebas | pytest (integración) + GitHub Actions |
 

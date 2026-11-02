@@ -7,14 +7,16 @@ aqui solo se valida, se aplica el limite por usuario y se mapean errores a HTTP.
 
 from flask import current_app
 from flask.views import MethodView
-from flask_login import current_user, login_required
+from flask_jwt_extended import current_user
 from flask_smorest import Blueprint
 
+from api.auth import role_required
 from api.deps import container
 from api.errors import ApiError
 from api.v1.schemas.ai_schema import SuggestServiceRequestSchema, SuggestServiceResponseSchema
 from api.v1.schemas.error_schema import UNAUTHORIZED_EXAMPLE, ApiErrorSchema, error_example
 from domain.ai_assistant import errors as ai_errors
+from domain.shared.actor import ROLES
 
 blp = Blueprint('AI', __name__, description='LLM-powered assistant that suggests catalog services (RAG).')
 
@@ -36,7 +38,7 @@ def _error(status, description, example):
 @blp.route('/suggest-service')
 class SuggestService(MethodView):
 
-    @login_required
+    @role_required(*ROLES)
     @blp.arguments(SuggestServiceRequestSchema, example=REQUEST_EXAMPLE)
     @blp.response(200, SuggestServiceResponseSchema, description='Suggested services with price and duration.',
                   example={
@@ -51,7 +53,7 @@ class SuggestService(MethodView):
                                     'candidate_service_ids': [4, 3, 2]},
                       'usage': {'input_tokens': 412, 'output_tokens': 96, 'thinking_tokens': 0,
                                 'latency_ms': 1180, 'attempts': 1}})
-    @_error(401, 'No active session. Log in with POST /auth/login first.', UNAUTHORIZED_EXAMPLE)
+    @_error(401, 'Missing or invalid token. Log in with POST /api/auth/login first.', UNAUTHORIZED_EXAMPLE)
     @_error(422, 'Invalid body, e.g. a description that is too short or an unknown technique.', error_example(
         'validation_error', 'The request body is invalid',
         {'technique': ['Must be one of: zero_shot, few_shot, cot.']}))
@@ -65,7 +67,7 @@ class SuggestService(MethodView):
         'ai_not_configured', 'The AI assistant is not configured on this server', None))
     @_error(504, 'The provider did not answer before AI_TIMEOUT_SECONDS.', error_example(
         'llm_timeout', 'The AI provider did not answer in time, please try again', {'ai_call_id': 19, 'attempts': 1}))
-    @blp.doc(security=[{'cookieAuth': []}])
+    @blp.doc(security=[{'bearerAuth': []}])
     def post(self, data):
         """Suggest services for a symptom
 

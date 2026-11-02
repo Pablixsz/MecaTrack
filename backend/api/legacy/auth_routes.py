@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify
-from flask_login import current_user, login_required, login_user, logout_user
+from flask_jwt_extended import current_user, get_jwt
 
-from api.auth import SessionUser
+from api.auth import blocklist, role_required
 from api.deps import container
 from api.legacy import json_body, missing_field
+from domain.shared.actor import ROLES
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -20,19 +21,8 @@ def register():
     return jsonify({'message': 'Usuario registrado exitosamente', 'user_id': user.user_id}), 201
 
 
-@auth_bp.route('/login', methods=['POST'])
-def login():
-    data = json_body()
-    if 'email' not in data or 'password' not in data:
-        return jsonify({'error': 'Correo y contraseña son obligatorios'}), 400
-
-    user = container().auth.authenticate(data['email'], data['password'])
-    login_user(SessionUser(user))
-    return jsonify({'message': 'Sesión iniciada', 'user_id': user.user_id, 'role': user.role}), 200
-
-
 @auth_bp.route('/me', methods=['GET'])
-@login_required
+@role_required(*ROLES)
 def me():
     return jsonify({
         'user_id': current_user.user_id,
@@ -44,7 +34,8 @@ def me():
 
 
 @auth_bp.route('/logout', methods=['POST'])
-@login_required
+@role_required(*ROLES)
 def logout():
-    logout_user()
+    claims = get_jwt()
+    blocklist.revoke(claims['jti'], claims['exp'])
     return jsonify({'message': 'Sesión cerrada'}), 200

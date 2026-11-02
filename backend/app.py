@@ -16,8 +16,11 @@ def create_app(config_object=Config):
     """
     app = Flask(__name__)
     app.config.from_object(config_object)
+    if not app.config.get('JWT_SECRET_KEY'):
+        raise RuntimeError('JWT_SECRET_KEY is required: set it in backend/.env (see .env.example)')
 
-    CORS(app, supports_credentials=True, origins=app.config['CORS_ORIGINS'])
+    # Security: authentication uses a Bearer header, so CORS never allows credentials (cookies).
+    CORS(app, origins=app.config['CORS_ORIGINS'])
 
     db.init_app(app)
     migrate.init_app(app, db)

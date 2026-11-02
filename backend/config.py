@@ -1,11 +1,13 @@
 import os
+from datetime import timedelta
+
 from dotenv import load_dotenv
 
 # Carga backend/.env aunque el proceso se lance desde otra carpeta
 # (por ejemplo, flask db upgrade desde la raiz o los scripts de scripts/).
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 
-# Orígenes del frontend que pueden llamar a la API con cookies.
+# Orígenes del frontend que pueden llamar a la API.
 # Incluye 127.0.0.1 y localhost en 5500 (python -m http.server / Live Server)
 # y 5501 (Live Server cuando el 5500 está ocupado). Se puede cambiar con
 # CORS_ORIGINS="http://host:puerto,http://otro:puerto".
@@ -16,6 +18,11 @@ DEFAULT_CORS_ORIGINS = ','.join(
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
+    # Security: the signing key comes only from the environment (create_app refuses to start
+    # without it) and tokens travel in the Authorization header, so there is no CSRF surface.
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    JWT_TOKEN_LOCATION = ['headers']
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_SECONDS', 900)))
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CORS_ORIGINS = [o.strip() for o in os.environ.get('CORS_ORIGINS', DEFAULT_CORS_ORIGINS).split(',') if o.strip()]
@@ -75,6 +82,7 @@ class TestConfig(Config):
     """
     TESTING = True
     SECRET_KEY = 'test-secret-key'
+    JWT_SECRET_KEY = 'test-only-jwt-signing-key-with-enough-length'
     # El LLM se simula en las pruebas: nunca se usa la key real ni hay esperas.
     GEMINI_API_KEY = 'test-key'
     GEMINI_MODEL = 'test-model'

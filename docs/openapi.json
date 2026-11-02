@@ -1,6 +1,6 @@
 {
   "info": {
-    "description": "REST API of **MecaTrack**, a booking and vehicle-tracking system for a car repair workshop.\n\n* **Errors** always use the same JSON body: `{\"code\": \"...\", \"message\": \"...\", \"details\": ...}`.\n* **Authentication** is a session cookie. In Swagger UI, call `POST /auth/login` first\n  (for example with `carlos.owner@tallermecanico.com` / `test1234`, the test owner listed in the README);\n  the browser keeps the cookie and sends it on the following requests.\n* **Roles**: reading the catalog is public; creating, replacing or deleting services\n  requires the `owner` or `admin` role, and so does the open-data market panel (`/api/v1/market`).",
+    "description": "REST API of **MecaTrack**, a booking and vehicle-tracking system for a car repair workshop.\n\n* **Errors** always use the same JSON body: `{\"code\": \"...\", \"message\": \"...\", \"details\": ...}`.\n* **Authentication** is a JWT Bearer token. Call `POST /api/auth/login`, then send\n  `Authorization: Bearer <access_token>` (Swagger UI: **Authorize**). Tokens are short-lived.\n* **Roles**: reading the catalog is public; creating, replacing or deleting services\n  requires the `owner` or `admin` role, and so does the open-data market panel (`/api/v1/market`).",
     "contact": {
       "name": "MecaTrack team - Universidad Manuela Beltran"
     },
@@ -16,16 +16,16 @@
   "tags": [
     {
       "name": "Auth",
-      "description": "Session management (pre-existing routes)."
+      "description": "JWT login, logout and RBAC test endpoints."
     }
   ],
   "components": {
     "securitySchemes": {
-      "cookieAuth": {
-        "type": "apiKey",
-        "in": "cookie",
-        "name": "session",
-        "description": "Flask session cookie returned by POST /auth/login."
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Access token returned by POST /api/auth/login."
       }
     },
     "schemas": {
@@ -730,13 +730,13 @@
     }
   },
   "paths": {
-    "/auth/login": {
+    "/api/auth/login": {
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "Log in",
-        "description": "Starts a session and sets the `session` cookie used by the protected endpoints. This is a pre-existing route, so its errors use the legacy `{\"error\": \"...\"}` body.",
+        "description": "Returns a short-lived JWT access token with the user role as a claim. Send it as `Authorization: Bearer <access_token>`.",
         "requestBody": {
           "required": true,
           "content": {
@@ -771,20 +771,30 @@
         },
         "responses": {
           "200": {
-            "description": "Session started; the response sets the `session` cookie.",
+            "description": "Credentials accepted.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
+                    "access_token": {
                       "type": "string",
-                      "description": "Confirmation message.",
-                      "example": "Sesión iniciada"
+                      "description": "Signed JWT.",
+                      "example": "eyJhbGciOi..."
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "description": "Always Bearer.",
+                      "example": "Bearer"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Lifetime in seconds.",
+                      "example": 900
                     },
                     "user_id": {
                       "type": "integer",
-                      "description": "Id of the logged-in user.",
+                      "description": "Id of the user.",
                       "example": 1
                     },
                     "role": {
@@ -795,7 +805,9 @@
                   }
                 },
                 "example": {
-                  "message": "Sesión iniciada",
+                  "access_token": "eyJhbGciOi...",
+                  "token_type": "Bearer",
+                  "expires_in": 900,
                   "user_id": 1,
                   "role": "owner"
                 }
@@ -809,15 +821,28 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "code": {
                       "type": "string",
-                      "description": "Error message in Spanish (legacy format of the /auth routes).",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
                       "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
                     }
                   }
                 },
                 "example": {
-                  "error": "Correo y contraseña son obligatorios"
+                  "code": "bad_request",
+                  "message": "email and password are required",
+                  "details": null
                 }
               }
             }
@@ -829,15 +854,28 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "code": {
                       "type": "string",
-                      "description": "Error message in Spanish (legacy format of the /auth routes).",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
                       "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
                     }
                   }
                 },
                 "example": {
-                  "error": "Credenciales inválidas"
+                  "code": "invalid_credentials",
+                  "message": "Credenciales inválidas",
+                  "details": null
                 }
               }
             }
@@ -849,15 +887,28 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "code": {
                       "type": "string",
-                      "description": "Error message in Spanish (legacy format of the /auth routes).",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
                       "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
                     }
                   }
                 },
                 "example": {
-                  "error": "Tu cuenta está inactiva"
+                  "code": "forbidden",
+                  "message": "Tu cuenta está inactiva",
+                  "details": null
                 }
               }
             }
@@ -871,26 +922,19 @@
           "Auth"
         ],
         "summary": "Log out",
-        "description": "Ends the current session. Pre-existing route (legacy error format).",
+        "description": "Revokes the token used in this request.",
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
-            "description": "Session closed.",
+            "description": "Token revoked.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Confirmation message.",
-                      "example": "Sesión cerrada"
-                    }
-                  }
+                  "type": "object"
                 },
                 "example": {
                   "message": "Sesión cerrada"
@@ -899,7 +943,7 @@
             }
           },
           "401": {
-            "description": "There was no active session.",
+            "description": "Missing, expired or invalid token.",
             "content": {
               "application/json": {
                 "schema": {
@@ -908,12 +952,204 @@
                     "error": {
                       "type": "string",
                       "description": "Error message in Spanish (legacy format of the /auth routes).",
-                      "example": "Credenciales inválidas"
+                      "example": "Debes iniciar sesión para acceder a este recurso"
                     }
                   }
                 },
                 "example": {
                   "error": "Debes iniciar sesión para acceder a este recurso"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/admin": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Admin-only test endpoint",
+        "description": "Demonstrates RBAC: only the `admin` role gets 200.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Allowed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "message": "Hello admin",
+                  "required_role": "admin"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
+                      "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
+                    }
+                  }
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Authentication required: log in via POST /api/auth/login",
+                  "details": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The role of the token is not allowed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
+                      "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
+                    }
+                  }
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Your role is not allowed to perform this action",
+                  "details": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rbac/user": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "User-only test endpoint",
+        "description": "Demonstrates RBAC: only the `client` role gets 200.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Allowed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {
+                  "message": "Hello user",
+                  "required_role": "client"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, expired or invalid token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
+                      "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
+                    }
+                  }
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Authentication required: log in via POST /api/auth/login",
+                  "details": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The role of the token is not allowed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Stable error code.",
+                      "example": "invalid_credentials"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Readable message.",
+                      "example": "Credenciales inválidas"
+                    },
+                    "details": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Extra data, if any.",
+                      "example": null
+                    }
+                  }
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Your role is not allowed to perform this action",
+                  "details": null
                 }
               }
             }
@@ -1044,7 +1280,7 @@
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1065,7 +1301,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1073,7 +1309,7 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
@@ -1117,13 +1353,13 @@
           }
         },
         "summary": "Create a service",
-        "description": "Adds a new service to the catalog of the authenticated user's\nworkshop. `service_name`, `estimated_duration_minutes` and\n`base_price` are required; `status` defaults to `active`.\nRequires an `owner` or `admin` session (cookie from POST /auth/login).",
+        "description": "Adds a new service to the catalog of the authenticated user's\nworkshop. `service_name`, `estimated_duration_minutes` and\n`base_price` are required; `status` defaults to `active`.\nRequires an `owner` or `admin` token (from POST /api/auth/login).",
         "tags": [
           "Services"
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -1217,7 +1453,7 @@
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1238,7 +1474,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1246,7 +1482,7 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
@@ -1307,13 +1543,13 @@
           }
         },
         "summary": "Replace a service",
-        "description": "Replaces every editable field of the service. This is a full\nreplacement, not a partial update: omitted optional fields go back to\ntheir defaults. To retire a service that already has appointments,\nsend `status: inactive`. Requires an `owner` or `admin` session.",
+        "description": "Replaces every editable field of the service. This is a full\nreplacement, not a partial update: omitted optional fields go back to\ntheir defaults. To retire a service that already has appointments,\nsend `status: inactive`. Requires an `owner` or `admin` token.",
         "tags": [
           "Services"
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       },
@@ -1338,7 +1574,7 @@
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1359,7 +1595,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1367,7 +1603,7 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
@@ -1395,13 +1631,13 @@
           }
         },
         "summary": "Delete a service",
-        "description": "Permanently deletes a service that has never been booked. If any\nappointment references it the API answers 409, because deleting it\nwould orphan those appointments; deactivate it with PUT\n(`status: inactive`) instead. Requires an `owner` or `admin` session.",
+        "description": "Permanently deletes a service that has never been booked. If any\nappointment references it the API answers 409, because deleting it\nwould orphan those appointments; deactivate it with PUT\n(`status: inactive`) instead. Requires an `owner` or `admin` token.",
         "tags": [
           "Services"
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       },
@@ -1510,7 +1746,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1518,7 +1754,7 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
@@ -1590,7 +1826,7 @@
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -1599,7 +1835,7 @@
       "get": {
         "responses": {
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1607,14 +1843,14 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1669,13 +1905,13 @@
           }
         },
         "summary": "List open-data sources and circuit states",
-        "description": "Returns each Colombian open-data source (RUNT vehicle fleet and DIVIPOLA\nfrom datos.gov.co, CNPV 2018 population from the DANE geoportal) with\nits last downloaded snapshot, plus the state of the circuit breaker\nthat protects each external host. Requires an `owner` or `admin` session.",
+        "description": "Returns each Colombian open-data source (RUNT vehicle fleet and DIVIPOLA\nfrom datos.gov.co, CNPV 2018 population from the DANE geoportal) with\nits last downloaded snapshot, plus the state of the circuit breaker\nthat protects each external host. Requires an `owner` or `admin` token.",
         "tags": [
           "Market"
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -1684,7 +1920,7 @@
       "post": {
         "responses": {
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1692,14 +1928,14 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1757,13 +1993,13 @@
           }
         },
         "summary": "Download the open data again",
-        "description": "Calls every source through the resilient HTTP client: transient\nfailures (timeouts, connection errors, HTTP 429/5xx) are retried with\nexponential backoff and jitter, and each host has a circuit breaker\n(3 consecutive failures open it for 30 s). A failing source does not\nstop the others and keeps its previous snapshot. Always answers 200;\ncheck `ok` per source. Requires an `owner` or `admin` session.",
+        "description": "Calls every source through the resilient HTTP client: transient\nfailures (timeouts, connection errors, HTTP 429/5xx) are retried with\nexponential backoff and jitter, and each host has a circuit breaker\n(3 consecutive failures open it for 30 s). A failing source does not\nstop the others and keeps its previous snapshot. Always answers 200;\ncheck `ok` per source. Requires an `owner` or `admin` token.",
         "tags": [
           "Market"
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -1820,7 +2056,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1828,14 +2064,14 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1882,7 +2118,7 @@
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -1937,7 +2173,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1945,14 +2181,14 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1999,7 +2235,7 @@
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }
@@ -2052,7 +2288,7 @@
             }
           },
           "401": {
-            "description": "No active session. Log in with POST /auth/login first.",
+            "description": "Missing or invalid token. Log in with POST /api/auth/login first.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2060,14 +2296,14 @@
                 },
                 "example": {
                   "code": "unauthorized",
-                  "message": "Authentication required: log in via POST /auth/login",
+                  "message": "Authentication required: log in via POST /api/auth/login",
                   "details": null
                 }
               }
             }
           },
           "403": {
-            "description": "The session role is not `owner` or `admin`.",
+            "description": "The token role is not `owner` or `admin`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2114,7 +2350,7 @@
         ],
         "security": [
           {
-            "cookieAuth": []
+            "bearerAuth": []
           }
         ]
       }

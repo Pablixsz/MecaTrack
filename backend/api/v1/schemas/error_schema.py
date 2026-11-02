@@ -17,6 +17,6 @@ def error_example(code, message, details=None):
     return {'code': code, 'message': message, 'details': details}
 
 
-UNAUTHORIZED_EXAMPLE = error_example('unauthorized', 'Authentication required: log in via POST /auth/login')
+UNAUTHORIZED_EXAMPLE = error_example('unauthorized', 'Authentication required: log in via POST /api/auth/login')
 FORBIDDEN_EXAMPLE = error_example('forbidden', 'Your role is not allowed to perform this action',
                                   {'required_roles': ['owner', 'admin'], 'your_role': 'client'})
