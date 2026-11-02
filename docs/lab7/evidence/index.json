@@ -278,5 +278,33 @@
     "description": "Verificacion final: score de mutacion",
     "source": "venv/bin/python ../scripts/mutation_score.py",
     "captured_at": "2026-11-01T22:54:53-05:00"
+  },
+  {
+    "file": "12c-final-sonar-overview.png",
+    "phase": "7",
+    "description": "SonarCloud final: Quality Gate aprobado, sin bugs ni vulnerabilidades",
+    "source": "https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack",
+    "captured_at": "2026-11-01T22:55:29-05:00"
+  },
+  {
+    "file": "12d-final-sonar-new-code.png",
+    "phase": "7",
+    "description": "SonarCloud final: condiciones sobre el codigo nuevo",
+    "source": "https://sonarcloud.io/summary/new_code?id=Pablixsz_MecaTrack",
+    "captured_at": "2026-11-01T22:55:39-05:00"
+  },
+  {
+    "file": "12e-final-actions.png",
+    "phase": "7",
+    "description": "GitHub Actions: ejecuciones de la rama mecatrack-final",
+    "source": "https://github.com/Pablixsz/MecaTrack/actions?query=branch%3Amecatrack-final",
+    "captured_at": "2026-11-01T22:55:46-05:00"
+  },
+  {
+    "file": "12f-final-readme-badges.png",
+    "phase": "7",
+    "description": "README final con los badges",
+    "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/README.md",
+    "captured_at": "2026-11-01T22:55:53-05:00"
   }
 ]
