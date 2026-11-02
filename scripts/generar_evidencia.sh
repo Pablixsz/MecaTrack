@@ -81,7 +81,7 @@ fi
 
 step "7. Informe Word"
 if [ -f informe/build_informe_guia6.js ]; then
-  [ -d informe/node_modules ] || (cd informe && npm install --no-audit --no-fund --silent)
+  [ -d informe/node_modules ] || (cd informe && npm install --ignore-scripts --no-audit --no-fund --silent)
   (cd informe && node build_informe_guia6.js)
 else
   echo "  (todavia no existe informe/build_informe_guia6.js)"

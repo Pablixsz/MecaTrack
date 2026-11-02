@@ -134,3 +134,16 @@ def test_unknown_api_route_uses_error_format_but_legacy_routes_do_not(app):
     # Las rutas antiguas conservan su formato {"error": ...}
     legacy = anonymous.post('/services', json={})
     assert legacy.status_code == 401 and 'error' in legacy.get_json()
+
+
+# --- Regresion SonarCloud S5131 (reflected XSS) -----------------------------
+
+def test_user_input_is_echoed_only_as_non_sniffable_json(login):
+    owner = login('owner@test.com')
+    payload = {**NEW_SERVICE, 'service_name': '<script>alert(1)</script>'}
+
+    response = owner.post(URL, json=payload)
+
+    assert response.status_code == 201
+    assert response.mimetype == 'application/json'
+    assert response.headers['X-Content-Type-Options'] == 'nosniff'

@@ -209,4 +209,4 @@ async function iniciar() {
 }
 
 btnActualizar.addEventListener('click', actualizarDatos);
-iniciar();
+iniciar().catch(errorNoControlado);

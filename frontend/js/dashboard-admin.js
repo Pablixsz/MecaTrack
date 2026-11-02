@@ -79,7 +79,7 @@ async function cargarCitas() {
   try {
     todasLasCitas = await apiGet('/appointments');
     renderizarResumen();
-    renderizarCitas();
+    renderizarCitas().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -132,7 +132,7 @@ document.getElementById('filtro-fecha').addEventListener('change', renderizarCit
 document.getElementById('btn-limpiar-filtros').addEventListener('click', () => {
   document.getElementById('filtro-estado').value = '';
   document.getElementById('filtro-fecha').value = '';
-  renderizarCitas();
+  renderizarCitas().catch(errorNoControlado);
 });
 
 document.getElementById('tabla-citas').addEventListener('click', async (e) => {
@@ -142,7 +142,7 @@ document.getElementById('tabla-citas').addEventListener('click', async (e) => {
   try {
     await apiPut(`/appointments/${fila.dataset.id}/status`, { status: nuevoEstado });
     mostrarExito(`Cita #${fila.dataset.id} actualizada a "${NOMBRES_ESTADO_CITA[nuevoEstado]}".`);
-    cargarCitas();
+    cargarCitas().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -180,7 +180,7 @@ document.getElementById('tabla-bahias').addEventListener('change', async (e) => 
     mostrarExito('Bahía actualizada.');
   } catch (error) {
     mostrarError(error);
-    cargarBahias();
+    cargarBahias().catch(errorNoControlado);
   }
 });
 
@@ -193,7 +193,7 @@ document.getElementById('form-bahia').addEventListener('submit', async (e) => {
     });
     e.target.reset();
     mostrarExito('Bahía creada.');
-    cargarBahias();
+    cargarBahias().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -242,7 +242,7 @@ document.getElementById('tabla-repuestos').addEventListener('click', async (e) =
   try {
     await apiPut(`/parts/${fila.dataset.id}`, body);
     mostrarExito('Repuesto actualizado.');
-    cargarRepuestos();
+    cargarRepuestos().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -258,7 +258,7 @@ document.getElementById('form-repuesto').addEventListener('submit', async (e) =>
     });
     e.target.reset();
     mostrarExito('Repuesto creado.');
-    cargarRepuestos();
+    cargarRepuestos().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -309,7 +309,7 @@ document.getElementById('tabla-servicios').addEventListener('click', async (e) =
   try {
     await apiPut(`/services/${fila.dataset.id}`, body);
     mostrarExito('Servicio actualizado.');
-    cargarServicios();
+    cargarServicios().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -326,7 +326,7 @@ document.getElementById('form-servicio').addEventListener('submit', async (e) =>
     });
     e.target.reset();
     mostrarExito('Servicio creado.');
-    cargarServicios();
+    cargarServicios().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -360,7 +360,7 @@ document.getElementById('tabla-mecanicos').addEventListener('click', async (e) =
   try {
     await apiPut(`/businesses/mechanics/${fila.dataset.id}`, { status: e.target.dataset.status });
     mostrarExito('Mecánico actualizado.');
-    cargarMecanicos();
+    cargarMecanicos().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -379,7 +379,7 @@ document.getElementById('form-mecanico').addEventListener('submit', async (e) =>
     });
     e.target.reset();
     mostrarExito('Mecánico creado. Ya puede iniciar sesión con su correo.');
-    cargarMecanicos();
+    cargarMecanicos().catch(errorNoControlado);
   } catch (error) {
     mostrarError(error);
   }
@@ -459,14 +459,14 @@ async function cargarVehiculosCliente(seleccionarId = null) {
 
 $('form-buscar-cliente').addEventListener('submit', (e) => {
   e.preventDefault();
-  buscarClientes($('buscar-cliente').value.trim());
+  buscarClientes($('buscar-cliente').value.trim()).catch(errorNoControlado);
 });
 
 $('resultados-clientes').addEventListener('click', (e) => {
   const boton = e.target.closest('button[data-id]');
   if (!boton) return;
   const clientes = JSON.parse($('resultados-clientes').dataset.clientes || '[]');
-  seleccionarCliente(clientes.find(c => String(c.user_id) === boton.dataset.id));
+  seleccionarCliente(clientes.find(c => String(c.user_id) === boton.dataset.id)).catch(errorNoControlado);
 });
 
 $('btn-cliente-nuevo').addEventListener('click', () => {
@@ -590,4 +590,4 @@ $('resultado-cita').addEventListener('click', async (e) => {
 });
 
 // --- Inicio ---
-verificarSesion().then(ok => { if (ok) cargarCitas(); });
+verificarSesion().then(ok => (ok ? cargarCitas() : null)).catch(errorNoControlado);

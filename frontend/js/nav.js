@@ -64,4 +64,4 @@ function dibujarNav(usuario) {
 // Promesa con el usuario actual (o null si no hay sesión); otras páginas
 // pueden esperarla sin volver a pedir /auth/me.
 const sesionActual = apiGet('/auth/me').catch(() => null);
-sesionActual.then(dibujarNav);
+sesionActual.then(dibujarNav).catch(errorNoControlado);

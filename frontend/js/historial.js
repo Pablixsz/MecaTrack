@@ -83,7 +83,7 @@ listaVehiculos.addEventListener('click', async (e) => {
     if (!confirm('¿Seguro que quieres eliminar este vehículo?')) return;
     try {
       await apiDelete(`/vehicles/${id}`);
-      cargarVehiculos(); // recargamos la lista
+      cargarVehiculos().catch(errorNoControlado); // recargamos la lista
     } catch (error) {
       vehiculosErrorEl.textContent = error.message;
     }
@@ -117,7 +117,7 @@ document.getElementById('form-editar-vehiculo').addEventListener('submit', async
       year: parseInt(document.getElementById('edit-veh-anio').value),
     });
     bloqueEditar.classList.add('oculto');
-    cargarVehiculos();
+    cargarVehiculos().catch(errorNoControlado);
   } catch (error) {
     vehiculosErrorEl.textContent = error.message;
   }
@@ -262,7 +262,7 @@ listaCitas.addEventListener('click', async (e) => {
     boton.disabled = true;
     try {
       await apiPost(`/payments/${paymentId}/pay`, {});
-      cargarCitas(); // recargamos para reflejar el nuevo estado
+      cargarCitas().catch(errorNoControlado); // recargamos para reflejar el nuevo estado
     } catch (error) {
       boton.disabled = false;
       citasErrorEl.textContent = error.message;
@@ -274,7 +274,7 @@ listaCitas.addEventListener('click', async (e) => {
     const id = boton.dataset.id;
     try {
       await apiDelete(`/appointments/${id}`);
-      cargarCitas();
+      cargarCitas().catch(errorNoControlado);
     } catch (error) {
       citasErrorEl.textContent = error.message;
     }
@@ -282,5 +282,5 @@ listaCitas.addEventListener('click', async (e) => {
 });
 
 // --- Inicio ---
-cargarVehiculos();
-cargarCitas();
+cargarVehiculos().catch(errorNoControlado);
+cargarCitas().catch(errorNoControlado);

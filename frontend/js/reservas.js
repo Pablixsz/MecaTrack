@@ -56,7 +56,7 @@ async function cargarResumenServicio() {
   }
 }
 
-cargarResumenServicio();
+cargarResumenServicio().catch(errorNoControlado);
 
 // Todos los inputs required dentro del bloque de vehículo nuevo
 const camposNuevoVehiculo = bloqueNuevoVehiculo.querySelectorAll('input, select');
@@ -90,7 +90,7 @@ async function cargarVehiculos() {
   }
 }
 
-cargarVehiculos();
+cargarVehiculos().catch(errorNoControlado);
 
 // --- Envío del formulario ---
 document.getElementById('form-agendar').addEventListener('submit', async (e) => {

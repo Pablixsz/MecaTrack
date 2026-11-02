@@ -31,6 +31,12 @@ const ICONOS = {
   pausa: '<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>',
 };
 
+// Ultimo recurso para promesas sin await: las funciones cargar* ya muestran sus
+// errores de la API; esto registra lo que se les escape en vez de perderlo.
+function errorNoControlado(error) {
+  console.error(error);
+}
+
 function icono(nombre, extraClase = '') {
   return `<svg class="${extraClase}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" `
     + `stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONOS[nombre] || ''}</svg>`;

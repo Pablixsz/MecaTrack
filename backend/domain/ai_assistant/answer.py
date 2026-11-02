@@ -14,7 +14,7 @@ def parse_model_answer(text, allowed_ids):
     Devuelve (sugerencias, notes, reasoning, descartados). Los service_id que
     no estaban en el contexto se descartan: el modelo no puede inventar servicios.
     """
-    cleaned = re.sub(r'^```(?:json)?\s*|\s*```$', '', text.strip())
+    cleaned = re.sub(r'(?:^```(?:json)?\s*)|(?:\s*```$)', '', text.strip())
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError as exc:

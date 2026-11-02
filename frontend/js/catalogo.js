@@ -54,4 +54,4 @@ function renderizarServicios(servicios) {
   });
 }
 
-cargarServicios();
+cargarServicios().catch(errorNoControlado);

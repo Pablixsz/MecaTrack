@@ -5,5 +5,19 @@
     "description": "Estado inicial de la rama antes de la Guia 7",
     "source": "git log --oneline a636547 -5 && git branch --show-current",
     "captured_at": "2026-11-01T21:43:16-05:00"
+  },
+  {
+    "file": "01a-sonar-before-overview.png",
+    "phase": "1",
+    "description": "SonarCloud antes de las correcciones: resumen del proyecto (primer analisis)",
+    "source": "https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack",
+    "captured_at": "2026-11-01T21:49:25-05:00"
+  },
+  {
+    "file": "01b-sonar-before-critical.png",
+    "phase": "1",
+    "description": "SonarCloud antes: issues de seguridad con severidad alta",
+    "source": "https://sonarcloud.io/project/issues?id=Pablixsz_MecaTrack&issueStatuses=OPEN%2CCONFIRMED&impactSoftwareQualities=SECURITY&severities=BLOCKER%2CCRITICAL",
+    "captured_at": "2026-11-01T21:49:34-05:00"
   }
 ]

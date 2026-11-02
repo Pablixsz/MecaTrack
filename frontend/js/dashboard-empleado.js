@@ -43,7 +43,7 @@ async function cargarTodo() {
     );
 
     renderizarResumen(citas);
-    renderizarCitas(citas);
+    renderizarCitas(citas).catch(errorNoControlado);
   } catch (error) {
     listaCitas.innerHTML = '';
     citasErrorEl.textContent = 'No se pudieron cargar tus citas: ' + error.message;
@@ -285,4 +285,4 @@ listaCitas.addEventListener('submit', async (e) => {
   }
 });
 
-cargarTodo();
+cargarTodo().catch(errorNoControlado);

@@ -50,7 +50,7 @@ $PY scripts/export_ai_calls.py
 
 step "9. Diagrama e informe Word -> informe/Informe_Guia5_MecaTrack.docx"
 dot -Tpng -Gdpi=200 informe/arquitectura.dot -o informe/arquitectura.png
-[ -d informe/node_modules ] || (cd informe && npm install --no-audit --no-fund --silent)
+[ -d informe/node_modules ] || (cd informe && npm install --ignore-scripts --no-audit --no-fund --silent)
 (cd informe && node build_informe.js)
 
 step "Listo. Revisa los cambios con: git status"

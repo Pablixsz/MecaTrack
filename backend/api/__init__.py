@@ -40,6 +40,12 @@ def register_api(app):
     from api.openapi import init_api
     init_api(app)
 
+    @app.after_request
+    def security_headers(response):
+        # The API only serves JSON: browsers must not sniff it into executable HTML.
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        return response
+
     @login_manager.unauthorized_handler
     def unauthorized():
         if is_api_request():

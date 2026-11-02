@@ -6,6 +6,7 @@ from unittest.mock import create_autospec
 import pytest
 
 from application.ai_assistant.services import AiAssistantService
+from domain.ai_assistant.answer import parse_model_answer
 from domain.ai_assistant.errors import LlmTimeout, UserQuotaExceeded
 from domain.ai_assistant.ports import AiCallLog, LlmGateway, LlmResult
 from domain.catalog.ports import ServiceRepository
@@ -58,3 +59,14 @@ def test_quota_uses_the_injected_clock(deps, fixed_now):
     assert error.value.retry_after_s == 600  # la mas antigua sale de la ventana en 10 min
     deps['call_log'].api_calls_since.assert_called_once_with(3, fixed_now - timedelta(hours=1))
     deps['llm'].generate.assert_not_called()
+
+
+# --- Regresion SonarCloud S5850: el limpiador quita las dos cercas de codigo ---
+
+@pytest.mark.parametrize('text', [
+    '{"suggestions": []}',
+    '```json\n{"suggestions": []}\n```',
+    '```\n{"suggestions": []}\n```',
+])
+def test_parse_model_answer_strips_markdown_fences(text):
+    assert parse_model_answer(text, set())[0] == []
