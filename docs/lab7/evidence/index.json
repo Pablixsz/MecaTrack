@@ -19,5 +19,26 @@
     "description": "SonarCloud antes: issues de seguridad con severidad alta",
     "source": "https://sonarcloud.io/project/issues?id=Pablixsz_MecaTrack&issueStatuses=OPEN%2CCONFIRMED&impactSoftwareQualities=SECURITY&severities=BLOCKER%2CCRITICAL",
     "captured_at": "2026-11-01T21:49:34-05:00"
+  },
+  {
+    "file": "01c-sonar-quality-gate.png",
+    "phase": "1",
+    "description": "SonarCloud: Quality Gate aprobado sobre el codigo nuevo",
+    "source": "https://sonarcloud.io/summary/new_code?id=Pablixsz_MecaTrack",
+    "captured_at": "2026-11-01T22:10:37-05:00"
+  },
+  {
+    "file": "01d-sonar-after-overview.png",
+    "phase": "1",
+    "description": "SonarCloud despues de las correcciones: 0 bugs y cobertura",
+    "source": "https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack",
+    "captured_at": "2026-11-01T22:10:48-05:00"
+  },
+  {
+    "file": "02-pytest-coverage.png",
+    "phase": "1",
+    "description": "Pruebas y cobertura local del backend",
+    "source": "PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest -q -o addopts= --disable-warnings --cov --cov-report=term --cov-report=xml",
+    "captured_at": "2026-11-01T22:11:08-05:00"
   }
 ]
