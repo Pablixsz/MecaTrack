@@ -1,0 +1,11 @@
+[run]
+source = .
+branch = True
+omit =
+    tests/*
+    migrations/*
+    venv/*
+    mutants/*
+
+[report]
+skip_covered = True

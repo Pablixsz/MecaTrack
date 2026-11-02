@@ -4,12 +4,16 @@ on:
   push:
     paths:
       - 'backend/**'
+      - 'frontend/**'
+      - 'sonar-project.properties'
       - 'scripts/export_openapi.py'
       - 'docs/openapi.json'
       - '.github/workflows/mecatrack-tests.yml'
   pull_request:
     paths:
       - 'backend/**'
+      - 'frontend/**'
+      - 'sonar-project.properties'
       - 'scripts/export_openapi.py'
       - 'docs/openapi.json'
       - '.github/workflows/mecatrack-tests.yml'
@@ -50,9 +54,14 @@ jobs:
       # Sin key del LLM a proposito: las pruebas de /api/v1/ai lo simulan (mock)
       # y nunca deben llamar al proveedor real.
       GEMINI_API_KEY: ''
+      # Solo existe en el repo con SonarCloud conectado; sin el, el analisis se omite.
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          # SonarCloud necesita la historia completa para detectar el codigo nuevo.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v7.0.0
         with:
@@ -64,12 +73,18 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Ejecutar pruebas
-        run: python -m pytest --junitxml=pytest-report.xml
+        run: python -m pytest --junitxml=pytest-report.xml --cov --cov-report=xml --cov-report=term
 
       - name: Validar OpenAPI y verificar que docs/openapi.json este actualizado
         run: |
           python ../scripts/export_openapi.py
           git diff --exit-code -- ../docs/openapi.json
+
+      - name: Analisis de SonarCloud
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v8.4.0
+        with:
+          projectBaseDir: .
 
       - name: Publicar reporte de pruebas
         if: always()
