@@ -1,3 +1,4 @@
+import os
 from importlib import import_module
 
 from flask import Flask
@@ -38,4 +39,5 @@ def create_app(config_object=Config):
 # 'flask --app app db ...' (Flask-Migrate) encuentra create_app() solo.
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    # Security: the Werkzeug debugger allows code execution, so it is opt-in and only for local work.
+    app.run(host='127.0.0.1', port=5000, debug=os.environ.get('FLASK_DEBUG') == '1')

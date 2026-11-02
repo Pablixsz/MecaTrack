@@ -7,12 +7,14 @@ from api.auth import role_required
 from api.deps import container
 from api.errors import ApiError
 from api.legacy import json_body
+from api.rate_limit import limiter
 
 jwt_auth_bp = Blueprint('jwt_auth', __name__)
 rbac_bp = Blueprint('rbac', __name__)
 
 
 @jwt_auth_bp.route('/login', methods=['POST'])
+@limiter.limit(lambda: current_app.config['LOGIN_RATE_LIMIT'])
 def login():
     data = json_body()
     if not data.get('email') or not data.get('password'):

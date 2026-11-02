@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify
 
 from api.auth import role_required
 from api.deps import actor, container
-from api.legacy import json_body, missing_field
+from api.legacy import json_body, missing_field, paginate
 
 appointment_bp = Blueprint('appointments', __name__)
 
@@ -47,7 +47,7 @@ def create_appointment():
 @role_required('client', 'mechanic', 'admin', 'owner')
 def list_appointments():
     # El adaptador carga las relaciones con joinedload (una consulta, sin N+1).
-    return jsonify([_serialize_appointment(v) for v in container().appointments.list_for(actor())]), 200
+    return paginate([_serialize_appointment(v) for v in container().appointments.list_for(actor())]), 200
 
 
 @appointment_bp.route('/<int:appointment_id>', methods=['GET'])

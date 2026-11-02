@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from api.auth import role_required
 from api.deps import actor, container
-from api.legacy import json_body, missing_field
+from api.legacy import json_body, missing_field, paginate
 
 vehicle_bp = Blueprint('vehicles', __name__)
 
@@ -27,7 +27,7 @@ def list_my_vehicles():
     # Recepcion: owner/admin consultan los vehiculos de un cliente con ?client_user_id=
     client_user_id = request.args.get('client_user_id', type=int)
     vehicles = container().vehicles.list_mine(actor(), client_user_id=client_user_id)
-    return jsonify([_serialize_vehicle(v) for v in vehicles]), 200
+    return paginate([_serialize_vehicle(v) for v in vehicles]), 200
 
 
 @vehicle_bp.route('/<int:vehicle_id>', methods=['GET'])

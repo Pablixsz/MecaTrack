@@ -49,6 +49,10 @@ class SqlAlchemyAppointmentRepository(SqlAlchemyRepository, AppointmentRepositor
             query = query.filter(AppointmentRow.mechanic_user_id == actor.user_id)
         return [self._to_view(row) for row in query.order_by(AppointmentRow.scheduled_start.desc())]
 
+    def count_active_by_client(self, client_user_id):
+        return AppointmentRow.query.filter(AppointmentRow.client_user_id == client_user_id,
+                                           AppointmentRow.status.in_(BLOCKING_STATUSES)).count()
+
     def has_blocking_overlap(self, scheduled_start, scheduled_end, *, bay_id=None, mechanic_user_id=None,
                              exclude_appointment_id=None):
         """

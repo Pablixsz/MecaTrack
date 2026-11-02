@@ -23,6 +23,15 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     JWT_TOKEN_LOCATION = ['headers']
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_SECONDS', 900)))
+    # Security (OWASP API4): caps on request size and rate. The in-memory store assumes one
+    # server process; point RATELIMIT_STORAGE_URI at Redis when running several.
+    MAX_CONTENT_LENGTH = 1024 * 1024
+    RATELIMIT_DEFAULT = os.environ.get('RATELIMIT_DEFAULT', '300 per minute')
+    RATELIMIT_STORAGE_URI = os.environ.get('RATELIMIT_STORAGE_URI', 'memory://')
+    RATELIMIT_HEADERS_ENABLED = True
+    # Its own name: the limiter must not overwrite the Retry-After of the AI quota (429).
+    RATELIMIT_HEADER_RETRY_AFTER = 'X-RateLimit-Retry-After'
+    LOGIN_RATE_LIMIT = os.environ.get('LOGIN_RATE_LIMIT', '5 per minute')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CORS_ORIGINS = [o.strip() for o in os.environ.get('CORS_ORIGINS', DEFAULT_CORS_ORIGINS).split(',') if o.strip()]
@@ -83,6 +92,9 @@ class TestConfig(Config):
     TESTING = True
     SECRET_KEY = 'test-secret-key'
     JWT_SECRET_KEY = 'test-only-jwt-signing-key-with-enough-length'
+    # Practically unlimited: test_owasp_controls lowers the login limit where it is under test.
+    RATELIMIT_DEFAULT = '100000 per minute'
+    LOGIN_RATE_LIMIT = '100000 per minute'
     # El LLM se simula en las pruebas: nunca se usa la key real ni hay esperas.
     GEMINI_API_KEY = 'test-key'
     GEMINI_MODEL = 'test-model'

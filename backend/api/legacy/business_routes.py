@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from api.auth import role_required
 from api.deps import actor, container
-from api.legacy import json_body, missing_field
+from api.legacy import json_body, missing_field, paginate
 from api.legacy.auth_routes import REGISTER_FIELDS
 
 business_bp = Blueprint('businesses', __name__)
@@ -38,7 +38,7 @@ def create_mechanic():
 def search_clients():
     """Recepcion: busca clientes por nombre, apellido, correo o documento (?q=)."""
     clients = container().auth.search_clients(request.args.get('q') or None)
-    return jsonify([_serialize_client(c) for c in clients]), 200
+    return paginate([_serialize_client(c) for c in clients]), 200
 
 
 @business_bp.route('/clients', methods=['POST'])

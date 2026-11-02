@@ -9,7 +9,7 @@ from domain.payments.rules import split_price
 from domain.scheduling.allocation import ResourceAllocator
 from domain.scheduling.entities import APPOINTMENT_STATUSES, Appointment
 from domain.scheduling.ports import AppointmentRepository
-from domain.scheduling.rules import compute_end, ensure_participant
+from domain.scheduling.rules import MAX_ACTIVE_APPOINTMENTS, compute_end, ensure_participant
 from domain.shared.errors import Conflict, InvalidInput, NotFound, PermissionDenied
 from domain.shared.ports import UnitOfWork
 
@@ -45,6 +45,10 @@ class AppointmentService:
         vehicle = self._vehicles.get(vehicle_id)
         if not vehicle or vehicle.owner_user_id != client_id:
             raise InvalidInput('Vehículo inválido')
+
+        if self._appointments.count_active_by_client(client_id) >= MAX_ACTIVE_APPOINTMENTS:
+            raise Conflict(f'El cliente ya tiene {MAX_ACTIVE_APPOINTMENTS} citas activas',
+                           code='too_many_active_appointments')
 
         service = self._services.get(service_id)
         if not service or not service.is_bookable:
@@ -97,6 +101,8 @@ class AppointmentService:
             raise PermissionDenied('No tienes permiso para modificar esta cita')
         if new_status not in APPOINTMENT_STATUSES:
             raise InvalidInput(f'Estado inválido, debe ser uno de: {APPOINTMENT_STATUSES}')
+        if new_status == 'confirmed' and not self._deposit_is_paid(appointment_id):
+            raise Conflict('La cita solo se confirma con el depósito pagado', code='deposit_required')
         appointment.status = new_status
         self._appointments.save(appointment)
         self._uow.commit()
@@ -111,6 +117,10 @@ class AppointmentService:
         appointment.status = 'cancelled'
         self._appointments.save(appointment)
         self._uow.commit()
+
+    def _deposit_is_paid(self, appointment_id):
+        """Security (OWASP API6): staff cannot skip the deposit flow by editing the status."""
+        return any(p.is_deposit and p.is_completed for p in self._payments.list_by_appointment(appointment_id))
 
     def _get(self, appointment_id):
         appointment = self._appointments.get(appointment_id)

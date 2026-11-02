@@ -40,6 +40,8 @@ def deps():
     deps['allocator'].find_bay_and_mechanic.return_value = (make_bay(), make_mechanic())
     # El repositorio devuelve la cita con el id que asigna la BD.
     deps['appointments'].add.side_effect = lambda appointment: replace(appointment, appointment_id=7)
+    deps['appointments'].count_active_by_client.return_value = 0
+    deps['payments'].list_by_appointment.return_value = []
     return deps
 
 
@@ -295,3 +297,53 @@ def test_cancel_errors_explain_why(service, deps, actor, status, message):
     with pytest.raises(DomainError) as error:
         service.cancel(actor, 7)
     assert error.value.message == message
+
+
+# --- OWASP API6: flujos sensibles ----------------------------------------------
+
+def test_book_is_denied_at_the_active_appointment_limit(service, deps):
+    deps['appointments'].count_active_by_client.return_value = 5
+    with pytest.raises(Conflict) as error:
+        service.book(CLIENT, 10, 1, START)
+    assert error.value.code == 'too_many_active_appointments'
+    assert error.value.message == 'El cliente ya tiene 5 citas activas'
+    deps['appointments'].count_active_by_client.assert_called_once_with(CLIENT.user_id)
+    deps['allocator'].find_bay_and_mechanic.assert_not_called()
+
+
+def test_book_is_allowed_just_below_the_limit(service, deps):
+    deps['appointments'].count_active_by_client.return_value = 4
+    assert service.book(CLIENT, 10, 1, START).deposit_amount == 24000
+
+
+def test_reception_counts_the_appointments_of_the_client_not_of_the_admin(service, deps):
+    deps['appointments'].count_active_by_client.return_value = 0
+    service.book(OWNER, 10, 1, START, client_user_id=CLIENT.user_id)
+    deps['appointments'].count_active_by_client.assert_called_once_with(CLIENT.user_id)
+
+
+def test_confirming_requires_a_paid_deposit(service, deps):
+    deps['appointments'].get.return_value = make_appointment()
+    deps['payments'].list_by_appointment.return_value = [Payment(appointment_id=7, payment_type='deposit',
+                                                                 payment_method='cash', amount=1)]
+    with pytest.raises(Conflict) as error:
+        service.change_status(OWNER, 7, 'confirmed')
+    assert error.value.code == 'deposit_required'
+    assert error.value.message == 'La cita solo se confirma con el depósito pagado'
+    deps['payments'].list_by_appointment.assert_called_once_with(7)
+    deps['appointments'].save.assert_not_called()
+
+
+def test_a_paid_balance_does_not_replace_the_deposit(service, deps):
+    deps['appointments'].get.return_value = make_appointment()
+    deps['payments'].list_by_appointment.return_value = [Payment(appointment_id=7, payment_type='balance',
+                                                                 payment_method='cash', amount=1, status='completed')]
+    with pytest.raises(Conflict):
+        service.change_status(OWNER, 7, 'confirmed')
+
+
+def test_confirming_works_with_a_paid_deposit(service, deps):
+    deps['appointments'].get.return_value = make_appointment()
+    deps['payments'].list_by_appointment.return_value = [Payment(appointment_id=7, payment_type='deposit',
+                                                                 payment_method='cash', amount=1, status='completed')]
+    assert service.change_status(OWNER, 7, 'confirmed').status == 'confirmed'

@@ -18,6 +18,10 @@ class AppointmentRepository(ABC):
         """Cliente: sus citas; mecanico: las asignadas; admin/owner: todas."""
 
     @abstractmethod
+    def count_active_by_client(self, client_user_id: int) -> int:
+        """Citas del cliente que todavia ocupan bahia y mecanico."""
+
+    @abstractmethod
     def has_blocking_overlap(self, scheduled_start: datetime, scheduled_end: datetime, *,
                              bay_id: Optional[int] = None, mechanic_user_id: Optional[int] = None,
                              exclude_appointment_id: Optional[int] = None) -> bool:

@@ -4,6 +4,9 @@ from datetime import timedelta
 
 from domain.shared.errors import PermissionDenied
 
+# Security (OWASP API6): one client cannot hoard the workshop's bays and mechanics.
+MAX_ACTIVE_APPOINTMENTS = 5
+
 
 def compute_end(scheduled_start, duration_minutes):
     return scheduled_start + timedelta(minutes=duration_minutes)
