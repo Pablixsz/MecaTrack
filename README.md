@@ -1,6 +1,6 @@
 # MecaTrack
 
-[![CI](https://github.com/Pablixsz/MecaTrack/actions/workflows/mecatrack-tests.yml/badge.svg?branch=mecatrack-final)](https://github.com/Pablixsz/MecaTrack/actions/workflows/mecatrack-tests.yml) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Pablixsz_MecaTrack&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack) ![Mutation score](https://img.shields.io/badge/mutation%20score-98.3%25-brightgreen)
+[![CI](https://github.com/Pablixsz/MecaTrack/actions/workflows/mecatrack-tests.yml/badge.svg?branch=mecatrack-final)](https://github.com/Pablixsz/MecaTrack/actions/workflows/mecatrack-tests.yml) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Pablixsz_MecaTrack&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Pablixsz_MecaTrack) ![Mutation score](https://img.shields.io/badge/mutation%20score-98.4%25-brightgreen)
 
 Sistema de gestión de citas y seguimiento para un taller mecánico. Proyecto final individual de **Taller de Programación**.
 

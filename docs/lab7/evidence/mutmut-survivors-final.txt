@@ -1,5 +1,5 @@
     application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_14: survived
-    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_23: survived
-    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_69: survived
-    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_88: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_31: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_77: survived
+    application.scheduling.services.xǁAppointmentServiceǁbook__mutmut_96: survived
     application.scheduling.services.xǁAppointmentServiceǁ_client_for__mutmut_3: survived

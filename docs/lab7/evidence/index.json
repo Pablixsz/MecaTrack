@@ -201,5 +201,82 @@
     "description": "OWASP API8: security headers on a real response",
     "source": "curl -s -D - -o /dev/null http://127.0.0.1:5000/api/v1/services",
     "captured_at": "2026-11-01T22:43:34-05:00"
+  },
+  {
+    "file": "10a-codeql-0-alerts.png",
+    "phase": "6",
+    "description": "Security > Code scanning: 0 alertas abiertas de CodeQL",
+    "source": "https://github.com/Pablixsz/MecaTrack/security/code-scanning",
+    "captured_at": "2026-11-01T22:53:05-05:00"
+  },
+  {
+    "file": "10b-codeql-files-scanned.png",
+    "phase": "6",
+    "description": "CodeQL: archivos escaneados de Python, JavaScript y HTML",
+    "source": "https://github.com/Pablixsz/MecaTrack/security/code-scanning/tools/CodeQL/status",
+    "captured_at": "2026-11-01T22:53:13-05:00"
+  },
+  {
+    "file": "10c-codeql-run.png",
+    "phase": "6",
+    "description": "GitHub Actions: analisis de CodeQL para Python y JavaScript en verde",
+    "source": "https://github.com/Pablixsz/MecaTrack/actions/runs/41385100385",
+    "captured_at": "2026-11-01T22:53:19-05:00"
+  },
+  {
+    "file": "10d-codeql-workflow.png",
+    "phase": "6",
+    "description": "Configuracion de CodeQL en el repositorio",
+    "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/.github/workflows/codeql.yml",
+    "captured_at": "2026-11-01T22:53:26-05:00"
+  },
+  {
+    "file": "11a-security-settings.png",
+    "phase": "6",
+    "description": "Settings > Advanced Security: Dependency graph y Dependabot activados",
+    "source": "https://github.com/Pablixsz/MecaTrack/settings/security_analysis",
+    "captured_at": "2026-11-01T22:53:32-05:00"
+  },
+  {
+    "file": "11b-dependabot-prs.png",
+    "phase": "6",
+    "description": "Pull requests abiertos por Dependabot",
+    "source": "https://github.com/Pablixsz/MecaTrack/pulls?q=is%3Apr+is%3Aopen+author%3Aapp%2Fdependabot",
+    "captured_at": "2026-11-01T22:53:39-05:00"
+  },
+  {
+    "file": "11c-dependabot-pr.png",
+    "phase": "6",
+    "description": "Detalle de un PR de actualizacion abierto por Dependabot",
+    "source": "https://github.com/Pablixsz/MecaTrack/pull/2",
+    "captured_at": "2026-11-01T22:53:47-05:00"
+  },
+  {
+    "file": "11d-dependabot-yml.png",
+    "phase": "6",
+    "description": "dependabot.yml en el repositorio",
+    "source": "https://github.com/Pablixsz/MecaTrack/blob/mecatrack-final/.github/dependabot.yml",
+    "captured_at": "2026-11-01T22:53:53-05:00"
+  },
+  {
+    "file": "11e-dependabot-alerts.png",
+    "phase": "6",
+    "description": "Security > Dependabot: sin alertas abiertas",
+    "source": "https://github.com/Pablixsz/MecaTrack/security/dependabot",
+    "captured_at": "2026-11-01T22:53:59-05:00"
+  },
+  {
+    "file": "12a-final-tests-coverage.png",
+    "phase": "7",
+    "description": "Verificacion final: pruebas y cobertura",
+    "source": "PYTHONDONTWRITEBYTECODE=1 venv/bin/python -m pytest -q -o addopts= --disable-warnings --cov --cov-report=term --cov-report=xml",
+    "captured_at": "2026-11-01T22:54:51-05:00"
+  },
+  {
+    "file": "12b-final-mutation-score.png",
+    "phase": "7",
+    "description": "Verificacion final: score de mutacion",
+    "source": "venv/bin/python ../scripts/mutation_score.py",
+    "captured_at": "2026-11-01T22:54:53-05:00"
   }
 ]

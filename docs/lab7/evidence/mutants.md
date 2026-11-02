@@ -1,11 +1,12 @@
 # Mutation testing con mutmut
 
-Herramienta: mutmut 3.8.1. Alcance: `domain/scheduling`, `domain/payments`, `application/scheduling` y `application/payments` (294 mutantes), con las pruebas de `tests/unit`, sin base de datos.
+Herramienta: mutmut 3.8.1. Alcance: `domain/scheduling`, `domain/payments`, `application/scheduling` y `application/payments` (294 mutantes al inicio y 320 al final), con las pruebas de `tests/unit`, sin base de datos.
 
 | Momento | Killed | Survived | Sin pruebas | Total | Score |
 |---|---|---|---|---|---|
 | Inicial | 184 | 93 | 17 | 294 | 62.6 % |
-| Final | 289 | 5 | 0 | 294 | 98.3 % |
+| Tras las pruebas de la Fase 2 | 289 | 5 | 0 | 294 | 98.3 % |
+| Final, con la logica nueva de la Fase 5 | 315 | 5 | 0 | 320 | 98.4 % |
 
 El score mide solo ese alcance, no todo el backend. `test_architecture.py` se excluye de la corrida porque lee el codigo fuente, y el codigo instrumentado importa `mutmut`; sigue corriendo en el CI normal.
 
@@ -33,9 +34,9 @@ Sobrevivientes / sin pruebas, antes y despues.
 
 | Mutante | Cambio | Motivo |
 |---|---|---|
-| `book__mutmut_69` | Quita `status='pending'` de la cita | Equivalente: `pending` es el valor por defecto de la entidad |
-| `book__mutmut_88` | Quita `status='pending'` del pago | Equivalente: mismo motivo |
-| `book__mutmut_14`, `book__mutmut_23`, `_client_for__mutmut_3` | Altera el texto del mensaje con `XX` | Las pruebas comprueban el mensaje por coincidencia parcial; no cambia el comportamiento |
+| `status='pending'` de la cita | Quita `status='pending'` de la cita | Equivalente: `pending` es el valor por defecto de la entidad |
+| `status='pending'` del pago | Quita `status='pending'` del pago | Equivalente: mismo motivo |
+| Mensajes de `book` y `_client_for` | Altera el texto del mensaje con `XX` | Las pruebas comprueban el mensaje por coincidencia parcial; no cambia el comportamiento |
 
 ## Como ejecutarlo
 
