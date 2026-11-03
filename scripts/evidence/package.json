@@ -2,5 +2,5 @@
   "name": "mecatrack-evidence",
   "private": true,
   "description": "Herramientas de captura de evidencias reales (Guia 7)",
-  "dependencies": { "playwright": "1.64.0" }
+  "dependencies": { "playwright": "1.64.1" }
 }
