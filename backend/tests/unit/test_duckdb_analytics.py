@@ -120,4 +120,4 @@ def test_age_distribution_percentages_add_up_to_100(analytics):
 
 
 def test_duckdb_version_is_pinned():
-    assert duckdb.__version__ == '1.5.6'
+    assert duckdb.__version__ == '2.0.0'

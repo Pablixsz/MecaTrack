@@ -149,6 +149,8 @@ Se usó `create_autospec(Puerto, instance=True)` en lugar de `Mock()`. Un `Mock(
 
 **Dependencia nueva:** `duckdb==1.5.6`. Se descartó la 2.0.0 porque era una versión mayor publicada 3 días antes (2026-10-21); la 1.5.6 es del 2026-09-28 y tiene wheels para Python 3.12 (CI) y 3.14 (local).
 
+> **Actualización (2026-11-02):** se adoptó `duckdb==2.0.0` (PR #1 de Dependabot). Las tres consultas del panel Mercado dieron resultados idénticos con 1.5.6 y 2.0.0 sobre los snapshots locales. Las salidas de `docs/evidencia/salidas/11_duckdb_q1.txt` y `12_duckdb_q2.txt` se generaron con 1.5.6.
+
 ### Errores de la IA detectados en esta fase
 
 | Error | Cómo se detectó | Corrección |
