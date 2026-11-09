@@ -21,7 +21,7 @@ Werkzeug==3.1.9
 flask-cors==6.0.5
 apispec==6.10.0
 flask-smorest==0.47.0
-marshmallow==4.3.1
+marshmallow==4.4.0
 webargs==8.7.1
 google-genai==2.34.0
 httpx==0.28.1
