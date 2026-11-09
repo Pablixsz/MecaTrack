@@ -23,6 +23,6 @@ apispec==6.10.0
 flask-smorest==0.47.0
 marshmallow==4.3.1
 webargs==8.7.1
-google-genai==2.34.0
+google-genai==3.0.0
 httpx==0.28.1
 duckdb==2.0.0
