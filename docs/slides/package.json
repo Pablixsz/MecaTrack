@@ -1,0 +1,7 @@
+{
+  "name": "mecatrack-lab8-slides",
+  "private": true,
+  "description": "Builds the Lab 8 demo deck (docs/slides/MecaTrack_Lab8_Demo.pptx)",
+  "scripts": { "build": "node build_slides.js && zip -dq MecaTrack_Lab8_Demo.pptx '*/'" },
+  "dependencies": { "pptxgenjs": "4.0.1" }
+}

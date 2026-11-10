@@ -176,3 +176,16 @@ were outdated (team of three; the seed was fixed in Phase 1).
 
 **Placeholders left for the team:** `<DOCKERHUB_USERNAME>` (4), `<PUBLIC_URL>`, `<AUTHOR_2>`, `<AUTHOR_3>`,
 `<LICENSE>`. There is no LICENSE file: the AI did not pick a license because that is the authors' decision.
+
+## Extra — Demo slides
+
+**AI generated:** `docs/slides/build_slides.js` (pptxgenjs 4.0.1, pinned in `docs/slides/package.json`) and
+`docs/slides/MecaTrack_Lab8_Demo.pptx`: 3 English slides (architecture, pipeline + image size chart, quality metrics +
+JWT results) with speaker notes. All numbers are copied from generated reports, not invented.
+
+**QA:** file validated (OOXML schema and package checks) and rendered with LibreOffice. The first render had real
+defects that were fixed: inconsistent title alignment, words split across lines ("pip-audit", "90 %"), a label touching
+its card edge, and the bar chart showing the "before" bar at the bottom. The build also strips ZIP folder entries
+that break opening the deck from cloud storage.
+
+**For the team:** slide 2 has a dashed frame where the screenshot of the green pipeline goes (after the first merge).
