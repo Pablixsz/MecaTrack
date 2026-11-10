@@ -81,3 +81,38 @@ manually; login 200; 257 tests passed against the compose database; E2E passed (
 - First E2E run against compose timed out on the admin login. Cause: HTTP 429 — the login rate limit (5/min) counted
   the `curl` login done right before plus the script's 5 logins. The app behaved correctly; the script now honours
   `Retry-After` and retries once (the second run shows the wait).
+
+## Phase 4 — CI/CD pipeline (4 stages)
+
+**AI generated:** `.github/workflows/ci-cd.yml` (test → build → push → deploy, chained with `needs`; PRs run only
+test + build); `backend/ruff.toml`; `/health` now reports `version` (commit SHA baked by `--build-arg APP_VERSION`).
+Existing workflows (`mecatrack-tests.yml` with mutation testing + SonarCloud, `codeql.yml`) left untouched.
+
+**Design decisions:**
+- Actions pinned by commit SHA (as the repo already did). The AI first resolved tags with `git ls-remote --refs`,
+  noticed that for *annotated* tags that returns the tag object, not the commit, and re-checked the peeled refs:
+  all four Docker actions use lightweight tags, so the SHAs were right.
+- The deploy hook is called with `imgURL=<image>:sha-<short>` so Render deploys this commit's image, not whatever
+  `:latest` is; the job then waits until the public `/health` reports *this* commit, so an old instance answering
+  200 cannot fake a successful deploy.
+- Smoke test uses a `postgres://` URL on purpose to exercise the normalisation PaaS providers need.
+- Coverage gate 90 % (current 97.42 %).
+- Lint scope: ruff ≥ 0.17 enables many rules by default (135 findings, mostly style in legacy code). Chosen set:
+  E, F, W, B with E501 ignored. Real findings fixed: 7 missing final newlines, 3 `raise … from` (B904), 1
+  `zip(strict=True)` (B905).
+- bandit: 13 findings, 0 high. The 6 medium B608 ("SQL injection") were reviewed: the DuckDB queries are constants
+  built at import time and view names come from a fixed map, so they are false positives → `# nosec B608` with the
+  reason. 1 B311 (retry jitter) suppressed likewise. 6 low B105 ("hardcoded password": `'Bearer'`, test config,
+  OpenAPI examples) are reported but do not fail the gate (`--severity-level medium`). pip-audit: no known vulnerabilities.
+
+**Verified locally (real):** actionlint 1.7.12 + shellcheck → 0 errors in the 3 workflows; the `test` job's commands
+extracted from the YAML and executed → exit 0; the `build` job's smoke-test script extracted from the YAML and
+executed against a freshly built image → healthy, version = commit, user `app`.
+
+**NOT verified (needs GitHub/Docker Hub/Render):** the GHA layer cache, Docker Hub login and push, the Render deploy
+hook with `imgURL` and the public URL check. These run for the first time on the first push to `main`.
+
+**What failed / was corrected:**
+- bandit read the words written after `# nosec B608 - …` as test IDs and warned; the justification now goes before
+  the marker. bandit still prints "nosec encountered but no failed test" for lines inside multi-line strings — a
+  known bandit quirk, harmless.

@@ -47,5 +47,19 @@
     "description": "Health check reflects the database: stop db -> 503, start db -> 200 again",
     "source": "docker compose stop db 2>&1 | tail -1; curl -s -w ' HTTP %{http_code}\\n' localhost:8000/health; docker compose start db 2>&1 | tail -1; sleep 8; curl -s -w ' HTTP %{http_code}\\n' localhost:8000/health",
     "captured_at": "2026-11-09T20:40:42-05:00"
+  },
+  {
+    "file": "p4-01-actionlint.png",
+    "phase": "4",
+    "description": "actionlint 1.7.12 (+shellcheck): workflow files are valid",
+    "source": "docker run --rm -v \"$PWD\":/repo:Z --workdir /repo rhysd/actionlint:1.7.12 -verbose 2>&1 | grep -E 'Found|errors'",
+    "captured_at": "2026-11-09T20:47:35-05:00"
+  },
+  {
+    "file": "p4-02-quality-gates-local.png",
+    "phase": "4",
+    "description": "Quality gates of the test job run locally: ruff, coverage threshold, bandit, pip-audit",
+    "source": "PATH=$PWD/venv/bin:$PATH; ruff check . && python -m pytest -q -p no:warnings --cov --cov-fail-under=90 2>&1 | tail -3 && bandit -q -r . -x ./venv,./mutants,./tests,./migrations --severity-level medium && echo 'bandit: no medium/high issues' && pip-audit -r requirements.txt --progress-spinner off",
+    "captured_at": "2026-11-09T20:49:22-05:00"
   }
 ]

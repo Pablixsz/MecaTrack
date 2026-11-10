@@ -35,7 +35,7 @@ RUNT_CLEAN = f"""runt_limpio AS (
     FROM runt r
     JOIN clases_taller c ON c.clase = strip_accents(upper(trim(r.nombre_de_la_clase)))
     WHERE CAST(r.fecha_de_registro AS INTEGER) >= {MIN_REGISTRATION_YEAR}
-)"""
+)"""  # constant SQL assembled at import time, no user input  # nosec B608
 
 # --------------------------------------------------------------------------------------------
 # Q1. Antiguedad del parque por clase: estadisticas descriptivas PONDERADAS por cantidad.
@@ -74,7 +74,7 @@ SELECT clase,
 FROM acumulado
 GROUP BY clase
 ORDER BY vehiculos DESC
-"""
+"""  # constant SQL assembled at import time, no user input  # nosec B608
 
 # --------------------------------------------------------------------------------------------
 # Q2. Motorizacion por departamento: vehiculos (clases del taller) por cada 1.000 habitantes,
@@ -133,7 +133,7 @@ SELECT cod_dpto,
        rank() OVER (ORDER BY vehiculos / poblacion DESC NULLS LAST) AS puesto
 FROM cruce
 ORDER BY puesto, cod_dpto
-"""
+"""  # constant SQL assembled at import time, no user input  # nosec B608
 
 # Estadisticas descriptivas ENTRE departamentos de la consulta anterior (cada depto pesa 1).
 MOTORIZATION_SUMMARY = """
@@ -171,10 +171,10 @@ SELECT tipo_taller, rango, SUM(vehiculos)::BIGINT AS vehiculos,
 FROM rangos
 GROUP BY tipo_taller, rango
 ORDER BY tipo_taller, list_position(['0-4', '5-9', '10-14', '15-19', '20+'], rango)
-"""
+"""  # constant SQL assembled at import time, no user input  # nosec B608
 
 # Cuantos vehiculos quedaron fuera por el filtro de calidad (se informa en el resumen).
 EXCLUDED_BY_QUALITY = f"""
 SELECT coalesce(SUM(CAST(vehiculos AS BIGINT)), 0)::BIGINT AS excluidos
 FROM runt WHERE CAST(fecha_de_registro AS INTEGER) < {MIN_REGISTRATION_YEAR}
-"""
+"""  # constant SQL assembled at import time, no user input  # nosec B608

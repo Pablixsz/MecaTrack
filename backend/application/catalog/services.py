@@ -197,7 +197,7 @@ class ServiceCatalogService:
         try:
             business = self._business.for_actor(actor)
         except NotFound:
-            raise PermissionDenied('Your account is not linked to a workshop', code='business_not_linked')
+            raise PermissionDenied('Your account is not linked to a workshop', code='business_not_linked') from None
         self._ensure_unique_name(business.business_id, data['service_name'])
         service = self._services.add(Service(business_id=business.business_id, **data))
         self._commit_or_conflict(data['service_name'])
@@ -234,7 +234,7 @@ class ServiceCatalogService:
             self._uow.commit()
         except PersistenceConflict:
             raise Conflict(f"A service named '{service_name}' already exists", code='duplicate_service_name',
-                           details={'service_name': service_name})
+                           details={'service_name': service_name}) from None
 
 
 class VehicleService:

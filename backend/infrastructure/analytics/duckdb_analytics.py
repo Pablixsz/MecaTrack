@@ -51,7 +51,7 @@ class DuckDbMarketAnalytics(MarketAnalytics):
             # convierte el arreglo JSON en filas con una columna por campo.
             con.execute(f"""CREATE VIEW {view} AS
                             SELECT unnest(records, recursive := true)
-                            FROM read_json({_literal(path)}, maximum_object_size = 268435456)""")
+                            FROM read_json({_literal(path)}, maximum_object_size = 268435456)""")  # view name from the fixed SOURCES map, path escaped by _literal()  # nosec B608
             snapshots[SOURCES[view]] = con.execute(
                 'SELECT fetched_at FROM read_json(?, maximum_object_size = 268435456)', [path]).fetchone()[0]
         return con, snapshots
@@ -59,7 +59,7 @@ class DuckDbMarketAnalytics(MarketAnalytics):
     @staticmethod
     def _rows(relation):
         columns = [d[0] for d in relation.description]
-        return [dict(zip(columns, (float(v) if hasattr(v, 'is_finite') else v for v in row)))
+        return [dict(zip(columns, (float(v) if hasattr(v, 'is_finite') else v for v in row), strict=True))
                 for row in relation.fetchall()]
 
     def _run(self, views, sql):

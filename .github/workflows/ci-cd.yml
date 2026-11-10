@@ -1,0 +1,255 @@
+# MecaTrack CI/CD - four chained stages:
+#
+#   test ──► build ──► push ──► deploy
+#   (PRs)    (PRs)    (main)   (main)
+#
+# - test:   lint (ruff), unit + integration tests with coverage on a real PostgreSQL,
+#           security scans (bandit = code, pip-audit = dependencies / OWASP A06).
+# - build:  builds the production image and smoke-tests it: the container must
+#           become healthy against a database and must not run as root.
+# - push:   publishes the image to Docker Hub as :latest and :sha-<short>.
+# - deploy: tells Render to deploy exactly that image and waits until the public
+#           URL answers /health with the new commit.
+#
+# Required repository secrets (Settings > Secrets and variables > Actions):
+#   DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, RENDER_DEPLOY_HOOK_URL, PUBLIC_URL
+# Pull requests (including from forks) never see them: they only run test + build.
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  # A newer commit cancels an outdated PR run, but never a deploy that is in progress.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  IMAGE_NAME: mecatrack
+  PYTHON_VERSION: '3.12'
+  # Fails the pipeline below this line coverage (current: 97 %; margin for legitimate changes).
+  COVERAGE_MIN: '90'
+
+jobs:
+  # ------------------------------------------------------------------ 1. TEST
+  test:
+    name: 1 · Test & quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: taller_mecanico_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      # The suite only accepts a database whose name ends in _test.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/taller_mecanico_test
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/taller_mecanico_test
+      # Throw-away values for CI only; the tests also mock the LLM (no real key).
+      SECRET_KEY: ci-only-secret
+      JWT_SECRET_KEY: ci-only-jwt-signing-key-with-enough-length
+      GEMINI_API_KEY: ''
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install dependencies
+        run: pip install --only-binary ':all:' -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check --output-format=github .
+
+      - name: Tests + coverage (pytest)
+        run: >-
+          python -m pytest -p no:warnings
+          --junitxml=pytest-report.xml
+          --cov --cov-report=term --cov-report=xml --cov-report=html
+          --cov-fail-under=${{ env.COVERAGE_MIN }}
+
+      - name: Security scan of the code (bandit, fails on medium/high)
+        run: |
+          bandit -r . -x ./venv,./mutants,./tests,./migrations -f json -o bandit-report.json || true
+          bandit -r . -x ./venv,./mutants,./tests,./migrations --severity-level medium
+
+      - name: Vulnerable dependencies (pip-audit)
+        run: pip-audit -r requirements.txt --progress-spinner off
+
+      - name: Publish reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-and-quality-reports
+          path: |
+            backend/pytest-report.xml
+            backend/coverage.xml
+            backend/htmlcov/
+            backend/bandit-report.json
+          if-no-files-found: warn
+
+  # ----------------------------------------------------------------- 2. BUILD
+  build:
+    name: 2 · Build & smoke test image
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          load: true
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:ci
+          build-args: APP_VERSION=${{ github.sha }}
+          # Layer cache shared with the push job: the second build is almost free.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test (container healthy, /health 200, not root)
+        run: |
+          set -euo pipefail
+          docker network create smoke
+          docker run -d --name smoke-db --network smoke \
+            -e POSTGRES_USER=app -e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=mecatrack \
+            postgres:16-alpine
+          until docker exec smoke-db pg_isready -U app -d mecatrack >/dev/null 2>&1; do sleep 1; done
+          docker run -d --name smoke-app --network smoke -p 8000:8000 \
+            -e DATABASE_URL=postgres://app:smoke@smoke-db:5432/mecatrack \
+            -e SECRET_KEY=smoke-only -e JWT_SECRET_KEY=smoke-only-jwt-signing-key-with-enough-length \
+            ${{ env.IMAGE_NAME }}:ci
+          # postgres:// above on purpose: proves the URL normalisation PaaS providers need.
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health; then echo; break; fi
+            if [ "$i" = 30 ]; then echo "app never became healthy"; docker logs smoke-app; exit 1; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:8000/health | grep -q '"version":"${{ github.sha }}"'
+          curl -fsS -o /dev/null http://localhost:8000/
+          user="$(docker exec smoke-app whoami)"
+          echo "container user: $user"
+          test "$user" != "root"
+
+      - name: Container logs
+        if: always()
+        run: docker logs smoke-app 2>&1 | tail -40 || true
+
+  # ------------------------------------------------------------------ 3. PUSH
+  push:
+    name: 3 · Push to Docker Hub
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      image: ${{ steps.ref.outputs.image }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tags (latest + sha-<short>)
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+
+      - name: Build and push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: APP_VERSION=${{ github.sha }}
+          cache-from: type=gha
+
+      - name: Image reference for the deploy
+        id: ref
+        run: echo "image=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+  # ---------------------------------------------------------------- 4. DEPLOY
+  deploy:
+    name: 4 · Deploy to Render
+    needs: push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ steps.verify.outputs.url }}
+
+    steps:
+      - name: Trigger the Render deploy hook with the exact image
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE: ${{ needs.push.outputs.image }}
+        run: |
+          set -euo pipefail
+          test -n "$HOOK" || { echo "::error::Secret RENDER_DEPLOY_HOOK_URL is not set"; exit 1; }
+          # imgURL pins the deploy to this commit's tag instead of whatever :latest is.
+          encoded="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$IMAGE")"
+          curl -fsS -X POST "${HOOK}&imgURL=${encoded}" -o /dev/null -w "Render answered HTTP %{http_code}\n"
+
+      - name: Wait for the public URL to serve this commit
+        id: verify
+        env:
+          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
+        run: |
+          set -uo pipefail
+          test -n "$PUBLIC_URL" || { echo "::error::Secret PUBLIC_URL is not set"; exit 1; }
+          url="${PUBLIC_URL%/}"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          # Up to ~12 min: a free Render instance may be cold and the deploy pulls the image.
+          for i in $(seq 1 72); do
+            body="$(curl -fsS --max-time 20 "$url/health" 2>/dev/null || true)"
+            echo "[$i] $body"
+            if echo "$body" | grep -q '"version":"${{ github.sha }}"'; then
+              echo "Deployed: $url serves ${{ github.sha }}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::$url/health never reported version ${{ github.sha }}"
+          exit 1

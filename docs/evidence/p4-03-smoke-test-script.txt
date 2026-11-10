@@ -1,0 +1,22 @@
+set -euo pipefail
+docker network create smoke
+docker run -d --name smoke-db --network smoke \
+  -e POSTGRES_USER=app -e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=mecatrack \
+  postgres:16-alpine
+until docker exec smoke-db pg_isready -U app -d mecatrack >/dev/null 2>&1; do sleep 1; done
+docker run -d --name smoke-app --network smoke -p 8000:8000 \
+  -e DATABASE_URL=postgres://app:smoke@smoke-db:5432/mecatrack \
+  -e SECRET_KEY=smoke-only -e JWT_SECRET_KEY=smoke-only-jwt-signing-key-with-enough-length \
+  mecatrack:ci
+# postgres:// above on purpose: proves the URL normalisation PaaS providers need.
+for i in $(seq 1 30); do
+  if curl -fsS http://localhost:8000/health; then echo; break; fi
+  if [ "$i" = 30 ]; then echo "app never became healthy"; docker logs smoke-app; exit 1; fi
+  sleep 2
+done
+curl -fsS http://localhost:8000/health | grep -q '"version":"0fc3456e193a97d6b23967f0fc0285b5fbc1e999"'
+curl -fsS -o /dev/null http://localhost:8000/
+user="$(docker exec smoke-app whoami)"
+echo "container user: $user"
+test "$user" != "root"
+

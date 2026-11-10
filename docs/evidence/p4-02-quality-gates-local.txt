@@ -1,0 +1,19 @@
+# PATH=$PWD/venv/bin:$PATH; ruff check . && python -m pytest -q -p no:warnings --cov --cov-fail-under=90 2>&1 | tail -3 && bandit -q -r . -x ./venv,./mutants,./tests,./migrations --severity-level medium && echo 'bandit: no medium/high issues' && pip-audit -r requirements.txt --progress-spinner off
+# cwd: backend | exit 0
+
+All checks passed!
+99 files skipped due to complete coverage.
+Required test coverage of 90% reached. Total coverage: 97.42%
+================================================ 257 passed in 38.86s ================================================
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/duckdb_analytics.py:52
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/duckdb_analytics.py:54
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:37
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:47
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:48
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:87
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:88
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:157
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:158
+[tester]	WARNING	nosec encountered (B608), but no failed test on file ./infrastructure/analytics/queries.py:179
+bandit: no medium/high issues
+No known vulnerabilities found

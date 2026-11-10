@@ -86,7 +86,7 @@ class SuggestService(MethodView):
         except ai_errors.UserQuotaExceeded as exc:
             raise ApiError(429, 'user_quota_exceeded', f'You reached the limit of {limit} AI requests per hour',
                            {'retry_after_seconds': exc.retry_after_s},
-                           headers={'Retry-After': str(exc.retry_after_s)})
+                           headers={'Retry-After': str(exc.retry_after_s)}) from exc
 
         try:
             return assistant.suggest_services(data['description'], data['technique'], user_id=current_user.user_id)

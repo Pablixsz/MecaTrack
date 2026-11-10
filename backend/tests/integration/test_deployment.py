@@ -17,7 +17,7 @@ SEED_SQL = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'database',
 def test_health_is_200_when_the_database_answers(app):
     response = app.test_client().get('/health')
     assert response.status_code == 200
-    assert response.get_json() == {'status': 'ok', 'database': 'ok'}
+    assert response.get_json() == {'status': 'ok', 'database': 'ok', 'version': 'dev'}
 
 
 def test_health_is_503_when_the_database_is_down(app):

@@ -30,6 +30,9 @@ RUN pip install --only-binary=:all: -r /tmp/requirements.txt
 # ---------- Stage 2: runtime ----------
 FROM ${PYTHON_IMAGE} AS runtime
 
+# Commit SHA passed by CI (--build-arg APP_VERSION=...); shown by GET /health.
+ARG APP_VERSION=dev
+
 LABEL org.opencontainers.image.title="MecaTrack" \
       org.opencontainers.image.description="Workshop appointments and vehicle tracking (Flask + PostgreSQL)" \
       org.opencontainers.image.source="https://github.com/Pablixsz/MecaTrack"
@@ -38,6 +41,7 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH=/opt/venv/bin:$PATH \
     FLASK_ENV=production \
+    APP_VERSION=${APP_VERSION} \
     PORT=8000 \
     FRONTEND_DIR=/app/frontend \
     MARKET_DATA_DIR=/app/var/market_data

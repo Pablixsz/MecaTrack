@@ -86,7 +86,7 @@ class GeminiGateway(LlmGateway):
                                  attempts, elapsed_ms()) from exc
             except genai_errors.APIError as exc:
                 if exc.code in RETRYABLE_STATUS and attempts <= s['max_retries']:
-                    delay = s['backoff_s'] * (2 ** (attempts - 1)) + random.uniform(0, s['backoff_s'] / 2)
+                    delay = s['backoff_s'] * (2 ** (attempts - 1)) + random.uniform(0, s['backoff_s'] / 2)  # retry jitter, not security  # nosec B311
                     logger.warning('Gemini %s, retry %s in %.1f s', exc.code, attempts, delay)
                     self._sleep(delay)
                     continue

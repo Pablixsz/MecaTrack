@@ -29,6 +29,8 @@ def normalize_database_url(url):
 class Config:
     # Informative only (Flask 3 removed FLASK_ENV): 'production' in the container.
     APP_ENV = os.environ.get('FLASK_ENV', 'development')
+    # Git commit baked into the image by CI (Dockerfile ARG); /health reports it so a deploy can be verified.
+    APP_VERSION = os.environ.get('APP_VERSION', 'dev')
     SECRET_KEY = os.environ.get('SECRET_KEY')
     # Security: the signing key comes only from the environment (create_app refuses to start
     # without it) and tokens travel in the Authorization header, so there is no CSRF surface.

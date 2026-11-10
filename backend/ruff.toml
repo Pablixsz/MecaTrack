@@ -1,0 +1,14 @@
+# Lint gate of the CI/CD pipeline (ruff check). Explicit rule set: ruff >= 0.17 enables many
+# more rules by default, which would turn a version bump into a red pipeline.
+line-length = 120
+target-version = "py312"
+extend-exclude = ["venv", "mutants", "migrations"]
+
+[lint]
+# pycodestyle errors/warnings, pyflakes (unused/undefined names) and bugbear (likely bugs).
+select = ["E", "F", "W", "B"]
+# Long lines are mostly SQL, prompts and test data literals; the code is not auto-formatted.
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"tests/**" = ["E731"]

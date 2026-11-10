@@ -1,0 +1,10 @@
+# docker run --rm -v "$PWD":/repo:Z --workdir /repo rhysd/actionlint:1.7.12 -verbose 2>&1 | grep -E 'Found|errors'
+# cwd: . | exit 0
+
+verbose: Found 0 parse errors in 0 ms for .github/workflows/mecatrack-tests.yml
+verbose: Found 0 parse errors in 0 ms for .github/workflows/codeql.yml
+verbose: Found 0 parse errors in 0 ms for .github/workflows/ci-cd.yml
+verbose: Found total 0 errors in 0 ms for .github/workflows/codeql.yml
+verbose: Found total 0 errors in 26 ms for .github/workflows/mecatrack-tests.yml
+verbose: Found total 0 errors in 31 ms for .github/workflows/ci-cd.yml
+verbose: Found 0 errors in 3 files
