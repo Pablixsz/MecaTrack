@@ -198,3 +198,26 @@ depends on `image-size@1.2.1`, with two **high** advisories (GHSA-5p2g-fcmc-qvqq
 run `npm audit` before committing; pip-audit only covered the Python side. Fix: `overrides` pins `image-size` to
 2.1.0 (patched). The AI checked that pptxgenjs never imports `image-size` at runtime (it calls `require('sizeof')`),
 rebuilt the deck and confirmed identical slide content and a valid file. `npm audit`: 0 vulnerabilities.
+
+## After the Dependabot merges — SQLAlchemy 2.1 switched the PostgreSQL driver
+
+The team merged 10 Dependabot PRs into `mecatrack-final`, including SQLAlchemy 2.0.52 → 2.1.8 and google-genai
+2.34 → 3.0. The remote "pruebas de integracion" run went red. Locally: 108 of 257 tests errored and `create_app()`
+crashed with `ModuleNotFoundError: No module named 'psycopg'`. Cause: SQLAlchemy 2.1 maps a bare `postgresql://` to
+psycopg (v3) instead of psycopg2; the project ships `psycopg2-binary`.
+
+**Fix (smallest change):** `normalize_database_url` now pins `postgresql+psycopg2://` for bare `postgres://` and
+`postgresql://` URLs (an explicit driver is respected). Added a guard test that builds an engine and asserts the
+driver is psycopg2, so a future bump fails loudly in unit tests. The Lab 7 seed script uses the same helper.
+google-genai 3.0: the gateway's calls (`Client`, `HttpOptions`, `models.generate_content`, `GenerateContentConfig`,
+`errors.APIError`) were checked against the installed 3.0.0 — the AI tests mock the LLM, so this was verified apart.
+
+**Results (real):** 259/259 tests, 97.42 % coverage, ruff/bandit/pip-audit clean (57 packages), OpenAPI unchanged,
+image rebuilt and the CI smoke test passed.
+
+**AI mistake caught on the way:** the first smoke-test rerun reused a script generated earlier with an old commit SHA
+hard-coded, and the reported `exit=0` was `tail`'s, not the script's. The AI noticed the missing last line, regenerated
+the script with the current SHA and captured the real exit code before reporting success.
+
+**Lesson for the team:** Dependabot PRs were merged without waiting for the integration checks; a required status
+check on the branch (Settings → Branches) would have blocked the breaking one.

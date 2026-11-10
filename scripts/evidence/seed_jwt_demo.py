@@ -27,7 +27,7 @@ USERS = (('Carlos', 'owner@demo.test', 'owner', '9001'), ('Andres', 'mechanic@de
 
 
 def main(url_file):
-    base = make_url(os.environ['DATABASE_URL'])
+    base = make_url(config.normalize_database_url(os.environ['DATABASE_URL']))
     admin = create_engine(base.set(database='postgres'), isolation_level='AUTOCOMMIT')
     with admin.connect() as connection:
         connection.execute(text(f'DROP DATABASE IF EXISTS {DATABASE}'))

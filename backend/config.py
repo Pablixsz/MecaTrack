@@ -16,13 +16,21 @@ DEFAULT_CORS_ORIGINS = ','.join(
 )
 
 
+POSTGRES_DRIVER_SCHEME = 'postgresql+psycopg2://'
+
+
 def normalize_database_url(url):
     """
-    Render, Railway and Heroku hand out 'postgres://...', a scheme SQLAlchemy 2.0 no longer
-    accepts (it only knows 'postgresql://'). Only the scheme changes; the rest stays as is.
+    Pins the PostgreSQL driver in the URL scheme; only the scheme changes, the rest stays as is.
+
+    - Render, Railway and Heroku hand out 'postgres://...', a scheme SQLAlchemy 2.x rejects.
+    - A bare 'postgresql://' means psycopg2 in SQLAlchemy 2.0 but psycopg (v3) in 2.1+, so a
+      dependency bump would silently switch drivers. The project ships psycopg2-binary.
+    An explicit driver ('postgresql+psycopg://...') is respected.
     """
-    if url and url.startswith('postgres://'):
-        return 'postgresql://' + url[len('postgres://'):]
+    for bare in ('postgres://', 'postgresql://'):
+        if url and url.startswith(bare):
+            return POSTGRES_DRIVER_SCHEME + url[len(bare):]
     return url
 
 
