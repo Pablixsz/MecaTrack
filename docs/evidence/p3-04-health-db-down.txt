@@ -1,0 +1,9 @@
+# docker compose stop db 2>&1 | tail -1; curl -s -w ' HTTP %{http_code}\n' localhost:8000/health; docker compose start db 2>&1 | tail -1; sleep 8; curl -s -w ' HTTP %{http_code}\n' localhost:8000/health
+# cwd: . | exit 0
+
+ Container mecatrack-db-1 Stopped 
+{"database":"unreachable","status":"unavailable"}
+ HTTP 503
+ Container mecatrack-db-1 Started 
+{"database":"ok","status":"ok"}
+ HTTP 200

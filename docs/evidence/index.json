@@ -19,5 +19,33 @@
     "description": "docker history of the optimized image: only the venv and the code on top of python:3.12-slim",
     "source": "docker history mecatrack:optimized --format 'table {{.Size}}\\t{{.CreatedBy}}' | cut -c1-100",
     "captured_at": "2026-11-09T20:34:53-05:00"
+  },
+  {
+    "file": "p3-01-compose-up.png",
+    "phase": "3",
+    "description": "docker compose up --build from zero (after down -v): db healthy before app starts",
+    "source": "docker compose up --build -d 2>&1 | grep -v '^#' ; sleep 50; docker compose ps --format 'table {{.Service}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}'",
+    "captured_at": "2026-11-09T20:37:34-05:00"
+  },
+  {
+    "file": "p3-02-app-logs.png",
+    "phase": "3",
+    "description": "App container logs: migrations applied by the entrypoint, then gunicorn",
+    "source": "docker compose logs app --no-log-prefix 2>&1 | head -30",
+    "captured_at": "2026-11-09T20:37:34-05:00"
+  },
+  {
+    "file": "p3-03-seed-and-login.png",
+    "phase": "3",
+    "description": "Seed loaded manually (never automatic) and login with a seed user",
+    "source": "./scripts/dev.sh seed && curl -s -X POST localhost:8000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"laura.cliente@gmail.com\",\"password\":\"test1234\"}' | python3 -c 'import json,sys; d=json.load(sys.stdin); print({k:(v[:25]+\"...\" if k==\"access_token\" else v) for k,v in d.items()})'; echo; curl -s localhost:8000/health",
+    "captured_at": "2026-11-09T20:37:35-05:00"
+  },
+  {
+    "file": "p3-04-health-db-down.png",
+    "phase": "3",
+    "description": "Health check reflects the database: stop db -> 503, start db -> 200 again",
+    "source": "docker compose stop db 2>&1 | tail -1; curl -s -w ' HTTP %{http_code}\\n' localhost:8000/health; docker compose start db 2>&1 | tail -1; sleep 8; curl -s -w ' HTTP %{http_code}\\n' localhost:8000/health",
+    "captured_at": "2026-11-09T20:40:42-05:00"
   }
 ]

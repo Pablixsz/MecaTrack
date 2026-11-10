@@ -1,0 +1,16 @@
+# docker compose logs app --no-log-prefix 2>&1 | head -30
+# cwd: . | exit 0
+
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 26b91cd3e584, initial schema
+INFO  [alembic.runtime.migration] Running upgrade 26b91cd3e584 -> 6a4f4ff49bfe, add scheduling indexes
+INFO  [alembic.runtime.migration] Running upgrade 6a4f4ff49bfe -> ec27632baa28, unique service name per business
+INFO  [alembic.runtime.migration] Running upgrade ec27632baa28 -> 0243525bf206, ai_calls log table
+[2026-11-10 01:36:45 +0000] [1] [INFO] Starting gunicorn 26.2.0
+[2026-11-10 01:36:45 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+[2026-11-10 01:36:45 +0000] [1] [INFO] Using worker: gthread
+[2026-11-10 01:36:45 +0000] [9] [INFO] Booting worker with pid: 9
+127.0.0.1 - - [10/Nov/2026:01:36:49 +0000] "GET /health HTTP/1.1" 200 32 "-" "Python-urllib/3.12"
+127.0.0.1 - - [10/Nov/2026:01:37:04 +0000] "GET /health HTTP/1.1" 200 32 "-" "Python-urllib/3.12"
+127.0.0.1 - - [10/Nov/2026:01:37:19 +0000] "GET /health HTTP/1.1" 200 32 "-" "Python-urllib/3.12"

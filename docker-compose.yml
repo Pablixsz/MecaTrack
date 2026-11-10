@@ -1,0 +1,60 @@
+# MecaTrack - local stack: PostgreSQL + the production image of the app.
+#
+#   cp .env.example .env   # then fill in the secrets (or: ./scripts/dev.sh up, which generates them)
+#   docker compose up --build
+#   open http://localhost:8000
+#
+# Every value comes from .env; nothing secret is written here.
+
+name: mecatrack
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mecatrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-taller_mecanico}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Bound to localhost only, on 5433 so it does not clash with a local PostgreSQL on 5432.
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mecatrack:local
+    environment:
+      # The password must be URL-safe (letters, digits, - _ .): it is embedded in this URL.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mecatrack}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-taller_mecanico}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      FLASK_ENV: ${FLASK_ENV:-production}
+      PORT: "8000"
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      db:
+        # Wait until PostgreSQL accepts queries, not just until its container started.
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+volumes:
+  pgdata:

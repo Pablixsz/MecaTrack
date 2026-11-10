@@ -62,3 +62,22 @@ owned by root so a compromised process cannot rewrite it.
 - Gunicorn 26 logged `Control server error: Permission denied: '/app/.gunicorn'` — new in that version, it opens a
   control socket in `$HOME`, which the non-root user cannot write. Fixed with `control_socket_disable = True`.
   It was caught only because the AI read the container logs after the health check had already passed.
+
+## Phase 3 — docker compose
+
+**AI generated:** `docker-compose.yml` (postgres:16-alpine with named volume and `pg_isready`; app with
+`depends_on: service_healthy`, `/health` check, `restart: unless-stopped`), root `.env.example`, `scripts/dev.sh`
+(`up down reset seed logs test e2e ps`; `up` creates `.env` with random secrets, mode 600).
+
+**Why:** required variables use `${VAR:?message}` so compose refuses to start without secrets instead of starting
+with empty ones; the database is published only on `127.0.0.1:5433` (no clash with a local PostgreSQL, not exposed
+to the network).
+
+**Results (real):** from zero (`down -v`) both services healthy; entrypoint applied the 4 migrations; seed loaded
+manually; login 200; 257 tests passed against the compose database; E2E passed (appointment #3); `db` stopped →
+`/health` 503, started → 200 without restarting the app (`docs/evidence/p3-*`).
+
+**What failed / was corrected:**
+- First E2E run against compose timed out on the admin login. Cause: HTTP 429 — the login rate limit (5/min) counted
+  the `curl` login done right before plus the script's 5 logins. The app behaved correctly; the script now honours
+  `Retry-After` and retries once (the second run shows the wait).

@@ -1,0 +1,8 @@
+# ./scripts/dev.sh seed && curl -s -X POST localhost:8000/api/auth/login -H 'Content-Type: application/json' -d '{"email":"laura.cliente@gmail.com","password":"test1234"}' | python3 -c 'import json,sys; d=json.load(sys.stdin); print({k:(v[:25]+"..." if k=="access_token" else v) for k,v in d.items()})'; echo; curl -s localhost:8000/health
+# cwd: . | exit 0
+
+==> Loading database/seed.sql
+==> Seed loaded. Users: carlos.owner@ / andres.mecanico@tallermecanico.com, laura.cliente@gmail.com, admin@tallermecanico.com (test1234)
+{'access_token': 'eyJhbGciOiJIUzI1NiIsInR5c...', 'expires_in': 900, 'role': 'client', 'token_type': 'Bearer', 'user_id': 3}
+
+{"database":"ok","status":"ok"}

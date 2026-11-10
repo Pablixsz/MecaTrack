@@ -58,7 +58,14 @@ class Run:
         page.goto(f'{self.base}/index.html')
         page.fill('#login-email', email)
         page.fill('#login-password', PASSWORD)
-        page.click('#form-login button[type=submit]')
+        with page.expect_response(lambda resp: resp.url.endswith('/api/auth/login')) as answer:
+            page.click('#form-login button[type=submit]')
+        if answer.value.status == 429:
+            # The login rate limit (OWASP API4, 5/min per IP) is working: wait as told and retry once.
+            wait = int(answer.value.headers.get('retry-after', '60')) + 1
+            print(f'  [..] login rate-limited (429), waiting {wait}s as Retry-After says')
+            page.wait_for_timeout(wait * 1000)
+            page.click('#form-login button[type=submit]')
         page.wait_for_url(f'**/pages/{landing}', timeout=TIMEOUT_MS)
         page.wait_for_load_state('networkidle')
 

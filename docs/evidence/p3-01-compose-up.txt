@@ -1,0 +1,46 @@
+# docker compose up --build -d 2>&1 | grep -v '^#' ; sleep 50; docker compose ps --format 'table {{.Service}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+# cwd: . | exit 0
+
+ Image mecatrack:local Building 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Image mecatrack:local Built 
+ Volume mecatrack_pgdata Creating 
+ Network mecatrack_default Creating 
+ Network mecatrack_default Creating 
+ Volume mecatrack_pgdata Creating 
+ Volume mecatrack_pgdata Created 
+ Volume mecatrack_pgdata Created 
+ Network mecatrack_default Created 
+ Network mecatrack_default Created 
+ Container mecatrack-db-1 Creating 
+ Container mecatrack-db-1 Created 
+ Container mecatrack-app-1 Creating 
+ Container mecatrack-app-1 Created 
+ Container mecatrack-db-1 Starting 
+ Container mecatrack-db-1 Started 
+ Container mecatrack-db-1 Waiting 
+ Container mecatrack-db-1 Healthy 
+ Container mecatrack-app-1 Starting 
+ Container mecatrack-app-1 Started 
+SERVICE   IMAGE                STATUS                    PORTS
+app       mecatrack:local      Up 50 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+db        postgres:16-alpine   Up 55 seconds (healthy)   127.0.0.1:5433->5432/tcp
