@@ -189,3 +189,12 @@ its card edge, and the bar chart showing the "before" bar at the bottom. The bui
 that break opening the deck from cloud storage.
 
 **For the team:** slide 2 has a dashed frame where the screenshot of the green pipeline goes (after the first merge).
+
+## After the push — a vulnerability the AI introduced
+
+After pushing `mecatrack-final`, Dependabot flagged `docs/slides`: pptxgenjs 4.0.1 (added by the AI for the slides)
+depends on `image-size@1.2.1`, with two **high** advisories (GHSA-5p2g-fcmc-qvqq, GHSA-w3rx-r6r6-pgpr: infinite loops
+→ DoS while parsing JXL/HEIF/ICNS images). Real risk was low (local build, own images only), but the AI should have
+run `npm audit` before committing; pip-audit only covered the Python side. Fix: `overrides` pins `image-size` to
+2.1.0 (patched). The AI checked that pptxgenjs never imports `image-size` at runtime (it calls `require('sizeof')`),
+rebuilt the deck and confirmed identical slide content and a valid file. `npm audit`: 0 vulnerabilities.

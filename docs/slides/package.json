@@ -2,6 +2,14 @@
   "name": "mecatrack-lab8-slides",
   "private": true,
   "description": "Builds the Lab 8 demo deck (docs/slides/MecaTrack_Lab8_Demo.pptx)",
-  "scripts": { "build": "node build_slides.js && zip -dq MecaTrack_Lab8_Demo.pptx '*/'" },
-  "dependencies": { "pptxgenjs": "4.0.1" }
+  "scripts": {
+    "build": "node build_slides.js && zip -dq MecaTrack_Lab8_Demo.pptx '*/'"
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  },
+  "overrides": {
+    "image-size": "2.1.0"
+  },
+  "//": "image-size is pinned to a patched release (GHSA-5p2g-fcmc-qvqq, GHSA-w3rx-r6r6-pgpr); pptxgenjs never imports it at runtime."
 }
