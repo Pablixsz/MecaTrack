@@ -134,3 +134,29 @@ and the hook/URL secrets are set before merging to `main`, so the first pipeline
 
 **NOT verified:** that the free instance type accepts image-backed services (the free-plan page does not say it
 explicitly), the hook call and the public URL — they need the team's Render account.
+
+## Phase 6 — Demo: JWT and quality metrics
+
+**Human decision (Phase 0):** do not touch authentication — JWT + RBAC already existed (Flask-JWT-Extended).
+
+**AI generated:** `scripts/demo_jwt.sh` (9 live cases with curl: valid 200, wrong role 403, no token 401, tampered
+role claim 401, garbage token 401, expired token 401 `token_expired`, admin 200, logout then reuse 401
+`token_revoked`) and `scripts/quality_report.sh` (tests, line/branch coverage, ruff, bandit, pip-audit →
+console summary + `docs/quality-report.md`).
+
+**Design note:** a token signed with a wrong key that is also expired is rejected for its *signature*, which would
+not demonstrate expiry. The script signs the expired token with the real key (stdlib HMAC-SHA256, no dependencies),
+read from `JWT_SECRET_KEY` or the local `.env`; against a server whose key it does not have, the case is reported
+as SKIP, never faked.
+
+**Results (real):** demo 9/9 passed against the compose stack; quality report: 257/257 tests, 97.42 % line,
+90.59 % branch coverage, 0 ruff findings, bandit 0 high/medium (6 low false positives), 0 vulnerable dependencies
+in 54 packages (`docs/evidence/p6-*`).
+
+**What failed / was corrected:**
+- First run of `quality_report.sh` crashed: the AI read `summary.missing_lines` from coverage's JSON, which is a
+  count; the list is `files[f].missing_lines`.
+- The generated report said the B105 findings were "reviewed by the team" — not true yet (the AI reviewed them).
+  Reworded to point to this log. **Team: please confirm that review.**
+- shellcheck: 4 × SC2164 (`cd` without `|| exit`) fixed; 3 × SC2016 are intentional (variables expand inside the
+  database container) and annotated.

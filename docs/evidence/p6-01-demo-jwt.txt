@@ -1,0 +1,48 @@
+# ./scripts/demo_jwt.sh
+# cwd: . | exit 0
+
+MecaTrack JWT demo against http://localhost:8000
+
+== 1. Login as client -> access token
+{"token_type":"Bearer","expires_in":900,"role":"client","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6Ik..."}
+   payload (readable by anyone, protected by the signature):
+   {"fresh": false, "iat": 1794275635, "jti": "2ed04772-a6a6-46fa-8be0-58acec3e18b8", "type": "access", "sub": "3", "nbf": 1794275635, "csrf": "0c658217-39ef-4c24-ab3b-aab481317ace", "exp": 1794276535, "role": "client"}
+
+== 2. Valid token on an endpoint for clients
+   {"message":"Hello user","required_role":"client"}
+   PASS client token on /api/rbac/user -> HTTP 200
+
+== 3. Role without permission: client token on the admin endpoint
+   {"code":"forbidden","details":{"required_roles":["admin"],"your_role":"client"},"message":"Your role is not allowed to perform this action"}
+   PASS client token on /api/rbac/admin -> HTTP 403
+
+== 4. No token
+   {"code":"unauthorized","details":null,"message":"Authentication required: log in via POST /api/auth/login"}
+   PASS no Authorization header -> HTTP 401
+
+== 5. Tampered token: change the role claim to admin, keep the signature
+   forged payload: {"fresh": false, "iat": 1794275635, "jti": "2ed04772-a6a6-46fa-8be0-58acec3e18b8", "type": "access", "sub": "3", "nbf": 1794275635, "csrf": "0c658217-39ef-4c24-ab3b-aab481317ace", "exp": 1794276535, "role": "admin"}
+   {"code":"invalid_token","details":null,"message":"The token is not valid"}
+   PASS tampered token on /api/rbac/admin -> HTTP 401
+
+== 6. Garbage / wrongly signed token
+   {"code":"invalid_token","details":null,"message":"The token is not valid"}
+   PASS invalid token -> HTTP 401
+
+== 7. Expired token (signed with the real key, exp in the past)
+   exp = 2026-11-10T01:38:55Z (15 minutes ago)
+   {"code":"token_expired","details":null,"message":"The token has expired: log in again"}
+   PASS expired token -> HTTP 401
+   code = token_expired (not a signature error)
+
+== 8. Admin token on the admin endpoint
+   {"message":"Hello admin","required_role":"admin"}
+   PASS admin token on /api/rbac/admin -> HTTP 200
+
+== 9. Logout revokes the token (jti blocklist)
+   {"message":"Sesión cerrada"}
+   PASS logout -> HTTP 200
+   {"code":"token_revoked","details":null,"message":"The token was revoked: log in again"}
+   PASS same token after logout -> HTTP 401
+
+Result: 9 passed, 0 failed, 0 skipped

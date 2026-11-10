@@ -44,6 +44,7 @@ wait_healthy() {
 seed() {
   echo "==> Loading database/seed.sql"
   # -T: no TTY, so the file can be piped in. ON_ERROR_STOP: fail loudly (e.g. seeding twice).
+  # shellcheck disable=SC2016  # $POSTGRES_* must expand inside the db container, not here
   compose exec -T db sh -c 'psql -v ON_ERROR_STOP=1 -q -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < database/seed.sql
   echo "==> Seed loaded. Users: carlos.owner@ / andres.mecanico@tallermecanico.com, laura.cliente@gmail.com, admin@tallermecanico.com (test1234)"
 }
@@ -56,6 +57,7 @@ run_tests() {
   local user pass port
   user="$(env_value POSTGRES_USER)"; pass="$(env_value POSTGRES_PASSWORD)"; port="$(env_value DB_HOST_PORT)"
   # The suite refuses any database whose name does not end in _test: it never touches the app data.
+  # shellcheck disable=SC2016  # expanded inside the db container
   compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tc "SELECT 1 FROM pg_database WHERE datname='"'"'taller_mecanico_test'"'"'" | grep -q 1 || createdb -U "$POSTGRES_USER" taller_mecanico_test'
   local url="postgresql://${user}:${pass}@127.0.0.1:${port:-5433}/taller_mecanico_test"
   (cd backend && TEST_DATABASE_URL="$url" DATABASE_URL="$url" venv/bin/python -m pytest -q -p no:warnings --cov --cov-report=term "$@")

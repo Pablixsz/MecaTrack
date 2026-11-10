@@ -1,0 +1,17 @@
+# ./scripts/quality_report.sh
+# cwd: . | exit 0
+
+==> pytest + coverage
+==> ruff
+==> bandit
+==> pip-audit
+
+MecaTrack quality summary (commit 93278ca)
+  Tests (pytest, unit + integration)   257/257 passed in 39s                         gate: all pass       ✅ pass
+  Line coverage                        97.42 %                                       gate: ≥ 90 %         ✅ pass
+  Branch coverage                      90.59 %                                       gate: informative    —
+  Lint (ruff: E, F, W, B)              0 findings                                    gate: 0              ✅ pass
+  Code security (bandit)               high 0 · medium 0 · low 6                     gate: 0 high/medium  ✅ pass
+  Vulnerable dependencies (pip-audit)  0 known vulnerabilities in 54 packages        gate: 0              ✅ pass
+
+Report written to docs/quality-report.md

@@ -61,5 +61,19 @@
     "description": "Quality gates of the test job run locally: ruff, coverage threshold, bandit, pip-audit",
     "source": "PATH=$PWD/venv/bin:$PATH; ruff check . && python -m pytest -q -p no:warnings --cov --cov-fail-under=90 2>&1 | tail -3 && bandit -q -r . -x ./venv,./mutants,./tests,./migrations --severity-level medium && echo 'bandit: no medium/high issues' && pip-audit -r requirements.txt --progress-spinner off",
     "captured_at": "2026-11-09T20:49:22-05:00"
+  },
+  {
+    "file": "p6-01-demo-jwt.png",
+    "phase": "6",
+    "description": "JWT demo (curl): valid 200, wrong role 403, no/tampered/invalid/expired/revoked token 401",
+    "source": "./scripts/demo_jwt.sh",
+    "captured_at": "2026-11-09T20:53:56-05:00"
+  },
+  {
+    "file": "p6-02-quality-report.png",
+    "phase": "6",
+    "description": "scripts/quality_report.sh: tests, coverage, ruff, bandit, pip-audit in one summary",
+    "source": "./scripts/quality_report.sh",
+    "captured_at": "2026-11-09T20:56:50-05:00"
   }
 ]
