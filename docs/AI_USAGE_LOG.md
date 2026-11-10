@@ -160,3 +160,19 @@ in 54 packages (`docs/evidence/p6-*`).
   Reworded to point to this log. **Team: please confirm that review.**
 - shellcheck: 4 × SC2164 (`cd` without `|| exit`) fixed; 3 × SC2016 are intentional (variables expand inside the
   database container) and annotated.
+
+## Phase 7 — README and documentation
+
+**AI generated:** a new English `README.md` (1335 words by `wc -w`; 1054 excluding code blocks and badges) with
+features by role, stack, Mermaid architecture diagram, quick start, configuration, security, CI/CD, deployment,
+tests, structure, AI usage and authors; `docs/architecture.png` (the same diagram rendered with mermaid-cli 11.4.2,
+which also validated the Mermaid syntax).
+
+**Kept from the previous (Spanish) README:** roles, scheduling engine, security section, OWASP link. Detailed local
+setup without Docker is no longer in the README; `scripts/start-backend.sh` still works.
+
+**Corrections made on the way:** the old README said "individual project" and "seed.sql hashes cannot log in"; both
+were outdated (team of three; the seed was fixed in Phase 1).
+
+**Placeholders left for the team:** `<DOCKERHUB_USERNAME>` (4), `<PUBLIC_URL>`, `<AUTHOR_2>`, `<AUTHOR_3>`,
+`<LICENSE>`. There is no LICENSE file: the AI did not pick a license because that is the authors' decision.
