@@ -1,0 +1,13 @@
+# Phase 1 - pytest (unit + integration) 2026-11-09T20:28:30-05:00, Python 3.14.10
+infrastructure/market_data/clients.py                                  69      2     10      2    95%
+infrastructure/market_data/snapshot_store.py                           25      3      2      1    85%
+infrastructure/persistence/repositories/appointment_repository.py      36      2     12      2    92%
+infrastructure/persistence/repositories/base_repository.py             39      0      8      1    98%
+infrastructure/persistence/unit_of_work.py                             17      4      0      0    76%
+infrastructure/resilience/circuit_breaker.py                          101      0     20      1    99%
+infrastructure/resilience/http_client.py                               36      2      4      0    95%
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                2759     48    340     32    97%
+
+99 files skipped due to complete coverage.
+============================= 257 passed in 43.11s =============================

@@ -1,10 +1,13 @@
 // frontend/js/api.js
 // Wrapper centralizado de fetch. Ninguna otra página debe llamar fetch() directamente.
 
+// When Flask serves the pages (Docker, Render) the API is on the same origin: relative URLs.
+// Only a separate static server (Live Server on 5500/5501, or file://) points at Flask on :5000.
+const STATIC_DEV_SERVER = window.location.protocol === 'file:' || ['5500', '5501'].includes(window.location.port);
 const API_HOST = ['localhost', '127.0.0.1'].includes(window.location.hostname)
   ? window.location.hostname
   : '127.0.0.1';
-const API_BASE_URL = `http://${API_HOST}:5000`;
+const API_BASE_URL = STATIC_DEV_SERVER ? `http://${API_HOST}:5000` : '';
 const LOGIN_ENDPOINT = '/api/auth/login';
 
 // Security: the JWT lives in sessionStorage so it disappears when the tab closes, and it is

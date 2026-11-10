@@ -20,6 +20,14 @@ class UnitOfWork(ABC):
         ...
 
 
+class HealthProbe(ABC):
+    """Checks that a dependency the app cannot work without (the database) answers."""
+
+    @abstractmethod
+    def is_healthy(self) -> bool:
+        ...
+
+
 class Clock(ABC):
     @abstractmethod
     def now(self) -> datetime:

@@ -16,7 +16,19 @@ DEFAULT_CORS_ORIGINS = ','.join(
 )
 
 
+def normalize_database_url(url):
+    """
+    Render, Railway and Heroku hand out 'postgres://...', a scheme SQLAlchemy 2.0 no longer
+    accepts (it only knows 'postgresql://'). Only the scheme changes; the rest stays as is.
+    """
+    if url and url.startswith('postgres://'):
+        return 'postgresql://' + url[len('postgres://'):]
+    return url
+
+
 class Config:
+    # Informative only (Flask 3 removed FLASK_ENV): 'production' in the container.
+    APP_ENV = os.environ.get('FLASK_ENV', 'development')
     SECRET_KEY = os.environ.get('SECRET_KEY')
     # Security: the signing key comes only from the environment (create_app refuses to start
     # without it) and tokens travel in the Authorization header, so there is no CSRF surface.
@@ -32,8 +44,16 @@ class Config:
     # Its own name: the limiter must not overwrite the Retry-After of the AI quota (429).
     RATELIMIT_HEADER_RETRY_AFTER = 'X-RateLimit-Retry-After'
     LOGIN_RATE_LIMIT = os.environ.get('LOGIN_RATE_LIMIT', '5 per minute')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = normalize_database_url(os.environ.get('DATABASE_URL'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Managed databases close idle connections: test each one before use instead of failing a request.
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
+    # Number of reverse proxies in front of the app (Render: 1). With 0 the request is trusted as is;
+    # with 1, X-Forwarded-For/Proto give the real client IP (rate limits) and HTTPS (HSTS).
+    PROXY_FIX_HOPS = int(os.environ.get('PROXY_FIX_HOPS', 0))
+    # Static frontend served by Flask itself (one public URL). Set to '' to disable it.
+    FRONTEND_DIR = os.environ.get('FRONTEND_DIR',
+                                  os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend'))
     CORS_ORIGINS = [o.strip() for o in os.environ.get('CORS_ORIGINS', DEFAULT_CORS_ORIGINS).split(',') if o.strip()]
 
     # OpenAPI / flask-smorest
@@ -77,7 +97,7 @@ def _default_test_database_url():
     DATABASE_URL pero apuntando a la base 'taller_mecanico_test'.
     """
     from sqlalchemy.engine import make_url
-    base = os.environ.get('DATABASE_URL')
+    base = normalize_database_url(os.environ.get('DATABASE_URL'))
     if not base:
         return None
     return make_url(base).set(database='taller_mecanico_test').render_as_string(hide_password=False)
@@ -100,4 +120,4 @@ class TestConfig(Config):
     GEMINI_MODEL = 'test-model'
     AI_RETRY_BASE_SECONDS = 0
     MARKET_RETRY_BASE_SECONDS = 0
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or _default_test_database_url()
+    SQLALCHEMY_DATABASE_URI = normalize_database_url(os.environ.get('TEST_DATABASE_URL')) or _default_test_database_url()

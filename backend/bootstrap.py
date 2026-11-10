@@ -22,6 +22,7 @@ from application.payments.services import PaymentService
 from application.scheduling.services import AppointmentService
 from application.tracking.services import TrackingService
 from domain.scheduling.allocation import ResourceAllocator
+from domain.shared.ports import HealthProbe
 from infrastructure.analytics.duckdb_analytics import DuckDbMarketAnalytics
 from infrastructure.llm.gemini_gateway import GeminiGateway
 from infrastructure.market_data.clients import (SOCRATA_BASE, DanePopulationSource, DivipolaSource, RuntFleetSource,
@@ -38,6 +39,7 @@ from infrastructure.persistence.repositories.service_repository import SqlAlchem
 from infrastructure.persistence.repositories.service_tracking_repository import SqlAlchemyTrackingRepository
 from infrastructure.persistence.repositories.user_repository import SqlAlchemyUserRepository
 from infrastructure.persistence.repositories.vehicle_repository import SqlAlchemyVehicleRepository
+from infrastructure.persistence.health import SqlAlchemyHealthProbe
 from infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork, SystemClock
 from infrastructure.resilience.circuit_breaker import CircuitBreaker
 from infrastructure.resilience.http_client import ResilientHttpClient, TransientHttpError
@@ -61,6 +63,7 @@ class Container:
     tracking: TrackingService
     ai_assistant: AiAssistantService
     market_data: MarketDataService
+    health: HealthProbe
 
 
 def build_market_data(config, clock, transport=None):
@@ -121,6 +124,7 @@ def build_container(app):
         tracking=TrackingService(appointments, tracking, parts, uow),
         ai_assistant=AiAssistantService(services, llm, SqlAlchemyAiCallLog(), clock),
         market_data=build_market_data(app.config, clock),
+        health=SqlAlchemyHealthProbe(),
     )
 
 

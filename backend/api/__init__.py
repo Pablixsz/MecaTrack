@@ -62,6 +62,12 @@ def register_api(app):
     for module, name, prefix in LEGACY_BLUEPRINTS:
         app.register_blueprint(getattr(import_module(module), name), url_prefix=prefix)
 
+    from api.frontend import FRONTEND_CSP, frontend_bp, frontend_enabled
+    from api.health import health_bp
+    app.register_blueprint(health_bp)
+    if frontend_enabled(app):
+        app.register_blueprint(frontend_bp)
+
     # API v1 (flask-smorest). Va despues de los blueprints antiguos: el spec
     # documenta /auth/login y /auth/logout a partir de sus reglas.
     from api.openapi import init_api
@@ -74,7 +80,9 @@ def register_api(app):
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['Referrer-Policy'] = 'no-referrer'
         # Swagger UI needs its CDN scripts; everything else is JSON and loads nothing.
-        if request.path != '/docs':
+        if request.blueprint == 'frontend':
+            response.headers['Content-Security-Policy'] = FRONTEND_CSP
+        elif request.path != '/docs':
             response.headers['Content-Security-Policy'] = "default-src 'none'; frame-ancestors 'none'"
         if request.is_secure:
             response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'

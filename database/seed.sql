@@ -2,12 +2,16 @@
 -- SEED DATA - Datos de prueba para desarrollo
 -- ============================================
 
--- 1. USERS (3 usuarios: owner, mechanic, client)
+-- 1. USERS (4 usuarios: owner, mechanic, client, admin)
+--    Contrasena de TODOS: test1234 (solo datos de prueba, publica a proposito).
+--    El hash es scrypt de werkzeug.security.generate_password_hash('test1234'),
+--    el mismo formato que usa la app al registrar; asi el login funciona en una base nueva.
 INSERT INTO users (first_name, middle_name, last_name, second_last_name, document_number, email, role, password_hash, phone, status)
 VALUES
-('Carlos', NULL, 'Ramirez', 'Gomez', '1001234567', 'carlos.owner@tallermecanico.com', 'owner', 'hashed_password_123', '3001234567', 'active'),
-('Andres', NULL, 'Torres', 'Lopez', '1002345678', 'andres.mecanico@tallermecanico.com', 'mechanic', 'hashed_password_123', '3012345678', 'active'),
-('Laura', 'Maria', 'Gonzalez', 'Diaz', '1003456789', 'laura.cliente@gmail.com', 'client', 'hashed_password_123', '3023456789', 'active');
+('Carlos', NULL, 'Ramirez', 'Gomez', '1001234567', 'carlos.owner@tallermecanico.com', 'owner', 'scrypt:32768:8:1$HA3JPLlUGNkODLGM$3cb2543a2fa349d898f1ad3f64adcfa4a815c2920816a253ea30d52a8262fcf5b899e423b428b1ef866bb7d089d4b641edc6e0ccf2b7f6beb7523ca1a784e021', '3001234567', 'active'),
+('Andres', NULL, 'Torres', 'Lopez', '1002345678', 'andres.mecanico@tallermecanico.com', 'mechanic', 'scrypt:32768:8:1$HA3JPLlUGNkODLGM$3cb2543a2fa349d898f1ad3f64adcfa4a815c2920816a253ea30d52a8262fcf5b899e423b428b1ef866bb7d089d4b641edc6e0ccf2b7f6beb7523ca1a784e021', '3012345678', 'active'),
+('Laura', 'Maria', 'Gonzalez', 'Diaz', '1003456789', 'laura.cliente@gmail.com', 'client', 'scrypt:32768:8:1$HA3JPLlUGNkODLGM$3cb2543a2fa349d898f1ad3f64adcfa4a815c2920816a253ea30d52a8262fcf5b899e423b428b1ef866bb7d089d4b641edc6e0ccf2b7f6beb7523ca1a784e021', '3023456789', 'active'),
+('Ana', NULL, 'Martinez', 'Rojas', '1004567890', 'admin@tallermecanico.com', 'admin', 'scrypt:32768:8:1$HA3JPLlUGNkODLGM$3cb2543a2fa349d898f1ad3f64adcfa4a815c2920816a253ea30d52a8262fcf5b899e423b428b1ef866bb7d089d4b641edc6e0ccf2b7f6beb7523ca1a784e021', '3034567890', 'active');
 
 -- 2. BUSINESSES (1 negocio, dueño = Carlos)
 INSERT INTO businesses (business_name, tax_id, address, business_phone, business_registration_number, legal_documents_verified, owner_user_id)
