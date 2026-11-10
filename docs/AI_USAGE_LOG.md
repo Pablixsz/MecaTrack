@@ -116,3 +116,21 @@ hook with `imgURL` and the public URL check. These run for the first time on the
 - bandit read the words written after `# nosec B608 - …` as test IDs and warned; the justification now goes before
   the marker. bandit still prints "nosec encountered but no failed test" for lines inside multi-line strings — a
   known bandit quirk, harmless.
+
+## Phase 5 — Render deployment (configuration only)
+
+**AI generated:** `render.yaml` (Blueprint: image-backed web service + free PostgreSQL 16, generated secrets,
+`PROXY_FIX_HOPS=1`, `/health` check) and `docs/DEPLOY.md` (ordered steps, secrets, manual seed, limitations,
+troubleshooting).
+
+**Verification:** instead of trusting memory, the AI read Render's current docs (render.com/docs/free and
+/docs/deploy-hooks, 2026-11-09). Confirmed: spin-down after 15 min idle (~1 min to wake), free Postgres expires
+after 30 days (+14 days grace), 1 GB, one per workspace, no shell/disk on free. Found a detail that changed the
+design: `imgURL` must match the service image URL in everything but the tag → the guide insists on the
+`docker.io/` prefix. `render.yaml` validated against Render's official JSON Schema (render.com/schema/render.yaml.json): valid.
+
+**Ordering decision:** the first image is pushed by hand before creating the service (Render needs it to exist)
+and the hook/URL secrets are set before merging to `main`, so the first pipeline run on `main` can be green.
+
+**NOT verified:** that the free instance type accepts image-backed services (the free-plan page does not say it
+explicitly), the hook call and the public URL — they need the team's Render account.

@@ -1,0 +1,45 @@
+# Render Blueprint - MecaTrack (web service from the Docker Hub image + managed PostgreSQL).
+# Step-by-step guide: docs/DEPLOY.md
+#
+# BEFORE applying it: replace <DOCKERHUB_USERNAME> below, and make sure the image
+# docker.io/<DOCKERHUB_USERNAME>/mecatrack:latest already exists on Docker Hub
+# (Render pulls it when the service is created).
+
+services:
+  - type: web
+    name: mecatrack
+    runtime: image
+    image:
+      # Keep the "docker.io/" prefix: the CI deploy hook sends imgURL=docker.io/<user>/mecatrack:sha-<short>,
+      # and Render requires every part except the tag to match this URL exactly.
+      url: docker.io/<DOCKERHUB_USERNAME>/mecatrack:latest
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mecatrack-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      # Render puts one proxy in front of the app: real client IP for the rate limits, HTTPS for HSTS.
+      - key: PROXY_FIX_HOPS
+        value: "1"
+      # Optional AI assistant: set in the dashboard (never in this file). Without them /api/v1/ai answers 503.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+
+databases:
+  - name: mecatrack-db
+    databaseName: taller_mecanico
+    user: mecatrack
+    plan: free
+    region: oregon
+    postgresMajorVersion: "16"
