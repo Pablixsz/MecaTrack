@@ -1,0 +1,9 @@
+# for t in naive optimized; do echo "== mecatrack:$t"; docker image inspect mecatrack:$t --format "User=\"{{.Config.User}}\" Healthcheck={{if .Config.Healthcheck}}yes{{else}}no{{end}} Layers={{len .RootFS.Layers}}"; docker run --rm --entrypoint sh mecatrack:$t -c "echo whoami=\$(whoami) files_in_app=\$(find /app -type f | wc -l) git=\$(test -d /app/.git && echo yes || echo no) gcc=\$(command -v gcc || echo none) env_files=\$(find /app -name .env | wc -l)"; done
+# cwd: . | exit 0
+
+== mecatrack:naive
+User="" Healthcheck=no Layers=11
+whoami=root files_in_app=2430 git=yes gcc=/usr/bin/gcc env_files=0
+== mecatrack:optimized
+User="app" Healthcheck=yes Layers=11
+whoami=app files_in_app=153 git=no gcc=none env_files=0

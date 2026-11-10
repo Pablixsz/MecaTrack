@@ -1,0 +1,6 @@
+# docker images mecatrack
+# cwd: . | exit 0
+
+IMAGE                 ID             DISK USAGE   CONTENT SIZE   EXTRA
+mecatrack:naive       11bdb6da4ec7       2.27GB          658MB        
+mecatrack:optimized   a5ef3b4757da        436MB          105MB        

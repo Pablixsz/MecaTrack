@@ -17,3 +17,6 @@ graceful_timeout = 20
 accesslog = '-'
 errorlog = '-'
 wsgi_app = 'app:create_app()'
+# Gunicorn >= 26 opens a control socket under $HOME; the container user cannot write
+# there and the orchestrator (Docker/Render) already restarts and scales the process.
+control_socket_disable = True

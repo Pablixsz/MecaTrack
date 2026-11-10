@@ -1,0 +1,5 @@
+# BuildKit uses <Dockerfile>.dockerignore instead of the root .dockerignore.
+# The naive build copies "everything", except two things even a first attempt
+# must not ship: secrets (.env) and the developer's local virtualenv.
+**/.env
+**/venv

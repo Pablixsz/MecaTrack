@@ -1,0 +1,72 @@
+# Build context = repository root. The image only needs backend/ (code),
+# frontend/ and docker/entrypoint.sh; everything else is excluded.
+
+# VCS and CI
+.git
+.gitignore
+.gitattributes
+.github
+
+# Secrets: never baked into an image (configuration comes from the environment)
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python artefacts and local environments
+**/venv
+**/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.coverage
+**/coverage.xml
+**/htmlcov
+**/pytest-report.xml
+backend/mutants
+backend/.mutmut-cache
+backend/var
+
+# Tests and dev-only config are not shipped in the runtime image
+backend/tests
+backend/requirements-dev.txt
+backend/pytest.ini
+backend/.coveragerc
+backend/setup.cfg
+
+# Node
+**/node_modules
+
+# Documentation, reports, evidence and media (large, not needed at runtime)
+docs
+informe
+evidence
+*.md
+!backend/migrations/README
+*.docx
+*.pptx
+*.pdf
+*.mp4
+*.mov
+*.zip
+
+# Other parts of the repository not used by the web image
+database
+scripts
+python-services
+sonar-project.properties
+
+# Editors and OS
+.vscode
+.idea
+**/.DS_Store
+**/Thumbs.db
+
+# Docker files themselves
+Dockerfile*
+docker-compose*.yml
+.dockerignore

@@ -1,13 +1,21 @@
-"""Registro de evidencias de la Guia 7: docs/lab7/evidence/index.json."""
+"""
+Registro de evidencias: docs/lab7/evidence/index.json (Guia 7, con img/ y outputs/).
+
+Con EVIDENCE_DIR=docs/evidence (Guia 8) todo queda plano en esa carpeta: PNG, TXT e index.json.
+"""
 
 import json
 import os
 from datetime import datetime, timezone
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-EVIDENCE = os.path.join(ROOT, 'docs', 'lab7', 'evidence')
-IMG = os.path.join(EVIDENCE, 'img')
-OUTPUTS = os.path.join(EVIDENCE, 'outputs')
+if os.environ.get('EVIDENCE_DIR'):
+    EVIDENCE = os.path.join(ROOT, os.environ['EVIDENCE_DIR'])
+    IMG = OUTPUTS = EVIDENCE
+else:
+    EVIDENCE = os.path.join(ROOT, 'docs', 'lab7', 'evidence')
+    IMG = os.path.join(EVIDENCE, 'img')
+    OUTPUTS = os.path.join(EVIDENCE, 'outputs')
 INDEX = os.path.join(EVIDENCE, 'index.json')
 
 

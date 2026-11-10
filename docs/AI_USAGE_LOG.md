@@ -44,3 +44,21 @@ E2E through gunicorn: appointment booked, deposit paid, tracked, completed; no C
 - `pkill -f gunicorn` matched the AI's own shell command line and killed it (exit 144) twice; fixed with a `bin/[g]unicorn` pattern.
 - SonarLint flagged `random` in the E2E script (S2245) and then a comment containing the word NOSONAR (S7632); reworded.
 - Ruff 0.17 enables many more rules by default (135 findings on legacy code even with `--isolated`); an explicit rule set is deferred to Phase 4.
+
+## Phase 2 — Optimized Dockerfile
+
+**AI generated:** multi-stage `Dockerfile` (builder venv → `python:3.12-slim` runtime, uid 10001, read-only code,
+`HEALTHCHECK` with the Python stdlib because slim has no curl), `.dockerignore`, `docs/docker/Dockerfile.naive`
+and `docs/docker/size-comparison.md`. `scripts/evidence/evidence_index.py` gained an `EVIDENCE_DIR` override so the
+Lab 7 terminal-capture tool writes Lab 8 evidence (default behaviour unchanged).
+
+**Why:** a copied virtualenv instead of a wheel directory keeps pip and wheels out of the runtime layer; the code is
+owned by root so a compromised process cannot rewrite it.
+
+**Results (real):** 2.27 GB → 436 MB on disk (−80.8 %), 658 MB → 105 MB compressed (−84 %). `docker exec … whoami`
+→ `app`; container `healthy`; full E2E flow passed against the container (appointment #12).
+
+**What failed / was corrected:**
+- Gunicorn 26 logged `Control server error: Permission denied: '/app/.gunicorn'` — new in that version, it opens a
+  control socket in `$HOME`, which the non-root user cannot write. Fixed with `control_socket_disable = True`.
+  It was caught only because the AI read the container logs after the health check had already passed.

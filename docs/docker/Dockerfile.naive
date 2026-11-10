@@ -1,0 +1,18 @@
+# NAIVE image - kept ONLY as the "before" of the size comparison (docs/docker/size-comparison.md).
+# Do not deploy it. Typical first attempt:
+#   - single stage on the full python:3.12 image (compilers, headers, docs...)
+#   - copies the whole repository (docs, reports, tests, .git...)
+#   - pip keeps its cache, runs as root, no health check
+#
+# Build (from the repository root):
+#   docker build -f docs/docker/Dockerfile.naive -t mecatrack:naive .
+FROM python:3.12
+
+WORKDIR /app
+COPY . .
+RUN pip install -r backend/requirements.txt
+
+WORKDIR /app/backend
+ENV FRONTEND_DIR=/app/frontend
+EXPOSE 8000
+CMD ["sh", "-c", "flask --app app db upgrade && gunicorn"]

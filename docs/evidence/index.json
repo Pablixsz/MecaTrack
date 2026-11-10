@@ -1,0 +1,23 @@
+[
+  {
+    "file": "p2-01-docker-images.png",
+    "phase": "2",
+    "description": "Image size: naive (single-stage, python:3.12, root) vs optimized (multi-stage, slim, non-root)",
+    "source": "docker images mecatrack",
+    "captured_at": "2026-11-09T20:34:51-05:00"
+  },
+  {
+    "file": "p2-02-image-inspection.png",
+    "phase": "2",
+    "description": "Inside each image: user, files, .git, compiler, .env",
+    "source": "for t in naive optimized; do echo \"== mecatrack:$t\"; docker image inspect mecatrack:$t --format \"User=\\\"{{.Config.User}}\\\" Healthcheck={{if .Config.Healthcheck}}yes{{else}}no{{end}} Layers={{len .RootFS.Layers}}\"; docker run --rm --entrypoint sh mecatrack:$t -c \"echo whoami=\\$(whoami) files_in_app=\\$(find /app -type f | wc -l) git=\\$(test -d /app/.git && echo yes || echo no) gcc=\\$(command -v gcc || echo none) env_files=\\$(find /app -name .env | wc -l)\"; done",
+    "captured_at": "2026-11-09T20:34:52-05:00"
+  },
+  {
+    "file": "p2-03-optimized-history.png",
+    "phase": "2",
+    "description": "docker history of the optimized image: only the venv and the code on top of python:3.12-slim",
+    "source": "docker history mecatrack:optimized --format 'table {{.Size}}\\t{{.CreatedBy}}' | cut -c1-100",
+    "captured_at": "2026-11-09T20:34:53-05:00"
+  }
+]
